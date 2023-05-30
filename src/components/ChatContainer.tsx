@@ -1,0 +1,86 @@
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { Button, Input } from "@mantine/core";
+import ChatMessage from "./ChatMessage";
+
+function ChatContainer() {
+	const [currentMessage, setCurrentMessage] = useState<string>("");
+	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
+	const [messageHistory, setMessageHistory] = useState<string[]>([]);
+	const client = useRef<WebSocket | null>(null);
+
+	const updateMessageHistory = useCallback(
+		(message: string) => {
+			setMessageHistory((prevMessageHistory) => [
+				message,
+				...prevMessageHistory,
+			]);
+		},
+		[setMessageHistory]
+	);
+
+	useEffect(() => {
+		const socket = new WebSocket("ws://localhost:3001/");
+
+		socket.onopen = () => {
+			setConnectionStatus("Open");
+			console.log("Connected!");
+		};
+
+		socket.onmessage = (event) => {
+			updateMessageHistory(event.data);
+		};
+
+		client.current = socket;
+
+		return () => {
+			socket.close();
+		};
+	}, [updateMessageHistory]);
+
+	function handleSendMessage(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		if (currentMessage === "") return;
+		client.current?.send(currentMessage);
+		setCurrentMessage("");
+	}
+
+	return (
+		<div className="flex flex-1 max-w-5xl flex-col items-center p-4 bg-slate-950 rounded-xl">
+			<div className="flex flex-1 w-full rounded bg-slate-800">
+				<ul className="m-0 flex-1 h-96 p-2 overflow-y-scroll list-none no-scrollbar">
+					{messageHistory.map((message) => {
+						return (
+							<li className="mb-1">
+								<ChatMessage message={message} />
+							</li>
+						);
+					})}
+				</ul>
+			</div>
+			<div className="flex justify-center rounded mt-2 bg-slate-800 p-2">
+				<form
+					className="flex flex-1"
+					action="submit"
+					onSubmit={handleSendMessage}
+				>
+					<Input
+						type="text"
+						value={currentMessage}
+						className="flex-1"
+						onChange={(event) => setCurrentMessage(event.target.value)}
+						disabled={connectionStatus === "Open" ? false : true}
+					/>
+					<Button
+						className="ml-2"
+						type="submit"
+						disabled={connectionStatus === "Open" ? false : true}
+					>
+						Send
+					</Button>
+				</form>
+			</div>
+		</div>
+	);
+}
+
+export default ChatContainer;
