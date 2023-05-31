@@ -20,7 +20,7 @@ function ChatContainer() {
 	);
 
 	useEffect(() => {
-		const socket = new WebSocket("ws://localhost:3001/");
+		const socket = new WebSocket("ws://chat.pancho.moe/chat");
 
 		socket.onopen = () => {
 			setConnectionStatus("Open");
@@ -49,6 +49,7 @@ function ChatContainer() {
 
 	function handleSetUsername(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
+		// @ts-expect-error since we're using a form, we can assume that the first element is the input
 		setUsername(event.target[0].value);
 	}
 
