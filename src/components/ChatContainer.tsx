@@ -8,6 +8,7 @@ function ChatContainer() {
 	const [messageHistory, setMessageHistory] = useState<ChatMessageData[]>([]);
 	const [username, setUsername] = useState<string>("");
 	const client = useRef<WebSocket | null>(null);
+	const messageWindow = useRef<HTMLUListElement | null>(null);
 
 	const updateMessageHistory = useCallback(
 		(message: ChatMessageData) => {
@@ -20,7 +21,7 @@ function ChatContainer() {
 	);
 
 	useEffect(() => {
-		const socket = new WebSocket("ws://chat.pancho.moe/chat");
+		const socket = new WebSocket("wss://ws.pancho.moe");
 
 		socket.onopen = () => {
 			setConnectionStatus("Open");
@@ -38,6 +39,10 @@ function ChatContainer() {
 		};
 	}, [updateMessageHistory]);
 
+	useEffect(() => {
+		messageWindow.current?.scrollTo(0, messageWindow.current.scrollHeight);
+	}, [messageHistory]);
+
 	function handleSendMessage(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		if (currentMessage === "") return;
@@ -51,6 +56,10 @@ function ChatContainer() {
 		event.preventDefault();
 		// @ts-expect-error since we're using a form, we can assume that the first element is the input
 		setUsername(event.target[0].value);
+	}
+
+	function clearMessageHistory() {
+		setMessageHistory([]);
 	}
 
 	return (
@@ -71,7 +80,10 @@ function ChatContainer() {
 				</div>
 			</div>
 			<div className="flex flex-1 w-full rounded bg-slate-800">
-				<ul className="m-0 flex-1 h-96 p-2 overflow-y-scroll list-none no-scrollbar">
+				<ul
+					ref={messageWindow}
+					className="flex flex-col-reverse m-0 flex-1 h-96 p-2 overflow-y-scroll list-none no-scrollbar"
+				>
 					{messageHistory.map((message) => {
 						return (
 							<li className="mb-1">
@@ -98,7 +110,7 @@ function ChatContainer() {
 						}
 					/>
 					<Button
-						className="ml-2"
+						className="mx-2"
 						type="submit"
 						disabled={
 							(connectionStatus === "Open" ? false : true) ||
@@ -106,6 +118,9 @@ function ChatContainer() {
 						}
 					>
 						Send
+					</Button>
+					<Button color="red" onClick={clearMessageHistory}>
+						Clear chat
 					</Button>
 				</form>
 			</div>
