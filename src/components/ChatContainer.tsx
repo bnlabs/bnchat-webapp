@@ -1,15 +1,16 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Button, Input } from "@mantine/core";
-import ChatMessage from "./ChatMessage";
+import ChatMessage, { ChatMessageData } from "./ChatMessage";
 
 function ChatContainer() {
 	const [currentMessage, setCurrentMessage] = useState<string>("");
 	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
-	const [messageHistory, setMessageHistory] = useState<string[]>([]);
+	const [messageHistory, setMessageHistory] = useState<ChatMessageData[]>([]);
+	const [username, setUsername] = useState<string>("");
 	const client = useRef<WebSocket | null>(null);
 
 	const updateMessageHistory = useCallback(
-		(message: string) => {
+		(message: ChatMessageData) => {
 			setMessageHistory((prevMessageHistory) => [
 				message,
 				...prevMessageHistory,
@@ -27,7 +28,7 @@ function ChatContainer() {
 		};
 
 		socket.onmessage = (event) => {
-			updateMessageHistory(event.data);
+			updateMessageHistory(JSON.parse(event.data));
 		};
 
 		client.current = socket;
@@ -40,18 +41,40 @@ function ChatContainer() {
 	function handleSendMessage(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		if (currentMessage === "") return;
-		client.current?.send(currentMessage);
+		client.current?.send(
+			JSON.stringify({ message: currentMessage, username: username })
+		);
 		setCurrentMessage("");
+	}
+
+	function handleSetUsername(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		setUsername(event.target[0].value);
 	}
 
 	return (
 		<div className="flex flex-1 max-w-5xl flex-col items-center p-4 bg-slate-950 rounded-xl">
+			<div>
+				<strong>Connection Status:</strong> {connectionStatus}
+				<div className="flex items-center">
+					<strong className="mr-2">Username:</strong>
+					<form className="flex" action="submit" onSubmit={handleSetUsername}>
+						<Input
+							className="mb-2 mr-2"
+							disabled={username === "" ? false : true}
+						></Input>
+						<Button type="submit" disabled={username === "" ? false : true}>
+							Set username
+						</Button>
+					</form>
+				</div>
+			</div>
 			<div className="flex flex-1 w-full rounded bg-slate-800">
 				<ul className="m-0 flex-1 h-96 p-2 overflow-y-scroll list-none no-scrollbar">
 					{messageHistory.map((message) => {
 						return (
 							<li className="mb-1">
-								<ChatMessage message={message} />
+								<ChatMessage chatMessageData={message} />
 							</li>
 						);
 					})}
@@ -68,12 +91,18 @@ function ChatContainer() {
 						value={currentMessage}
 						className="flex-1"
 						onChange={(event) => setCurrentMessage(event.target.value)}
-						disabled={connectionStatus === "Open" ? false : true}
+						disabled={
+							(connectionStatus === "Open" ? false : true) ||
+							(username === "" ? true : false)
+						}
 					/>
 					<Button
 						className="ml-2"
 						type="submit"
-						disabled={connectionStatus === "Open" ? false : true}
+						disabled={
+							(connectionStatus === "Open" ? false : true) ||
+							(username === "" ? true : false)
+						}
 					>
 						Send
 					</Button>

@@ -9,7 +9,7 @@ function App() {
 			withNormalizeCSS
 			theme={{ colorScheme: "dark" }}
 		>
-			<div className="flex justify-center">
+			<div className="flex justify-center m-4">
 				<ChatContainer />
 			</div>
 		</MantineProvider>
