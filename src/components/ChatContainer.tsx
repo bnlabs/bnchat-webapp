@@ -86,7 +86,7 @@ function ChatContainer() {
 				>
 					{messageHistory.map((message) => {
 						return (
-							<li className="mb-1">
+							<li className="my-1">
 								<ChatMessage chatMessageData={message} />
 							</li>
 						);
