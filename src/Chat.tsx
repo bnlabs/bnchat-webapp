@@ -11,12 +11,21 @@ interface Message {
 
 const Chat = () => {
     const [inputValue, setInputValue] = useState('');
+    const [userName, setUserName] = useState('placeholder username');
+    const [conversationId, setConversationId] = useState('conversation id');
     const [messages, setMessages] = useState<Message[]>([]);
 
     const handleInputChange = (event:any) => {
         setInputValue(event.target.value);
       };
 
+    const handleUserNameInputChange = (event:any) => {
+        setUserName(event.target.value);
+    };
+
+    const handleConversationIdInputChange = (event:any) => {
+        setConversationId(event.target.value);
+    };
       
     const connection = useContext(SignalRContext);
         
@@ -37,12 +46,13 @@ const Chat = () => {
 
     },[connection]);
     
+    // d2a91240-8dd7-454a-9108-9c90af1b7381
     function sendMessage() {
         const object = {
             senderId: "310c993a-fa98-4929-a1ec-2af7bbae9ab0",
             content: inputValue,
-            senderName: "Hyotic",
-            conversationId: "d2a91240-8dd7-454a-9108-9c90af1b7381"
+            senderName: userName,
+            conversationId: conversationId
         }
         connection.invoke("SendMessage", object)
             .then(() => {
@@ -60,6 +70,8 @@ const Chat = () => {
                 <p>{msg.senderName}: {msg.content}</p>
             ))}
         </p>
+        <input type="text" value={userName} onChange={handleUserNameInputChange} />
+        <input type="text" value={conversationId} onChange={handleConversationIdInputChange} />
         <input type="text" value={inputValue} onChange={handleInputChange} />
     <button onClick={sendMessage}>Send</button>
     </>
