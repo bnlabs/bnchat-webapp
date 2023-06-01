@@ -1,20 +1,27 @@
 import { Avatar } from "@mantine/core";
+import { ReactNode } from "react";
 
 export type ChatMessageData = {
-	message: string;
 	username: string;
+	message: string;
 };
 
-function ChatMessage({ chatMessageData}: { chatMessageData: ChatMessageData }) {
+function ChatMessage({
+	username,
+	children,
+}: {
+	username: string;
+	children?: ReactNode;
+}) {
 	return (
 		<div className="bg-slate-900 p-2 rounded-xl">
 			<div className="flex items-center">
 				<Avatar size={"xs"} />
 				<div className="text-xs">
-					<strong>{chatMessageData.username}</strong>
+					<strong>{username}</strong>
 				</div>
 			</div>
-			<div className="break-words">{chatMessageData.message}</div>
+			<div className="break-words">{children ?? ""}</div>
 		</div>
 	);
 }

@@ -2,6 +2,7 @@ import ChatContainer from "./components/ChatContainer";
 import { MantineProvider } from "@mantine/core";
 
 function App() {
+	
 	return (
 		<MantineProvider
 			withGlobalStyles
