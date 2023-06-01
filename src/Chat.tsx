@@ -7,6 +7,7 @@ interface Message {
     content: string;
     senderName: string;
     conversationId: string;
+    timeStamp:string;
   }
 
 const Chat = () => {
@@ -67,7 +68,7 @@ const Chat = () => {
     return <>
         <p>
             {messages.map(msg => (
-                <p>{msg.senderName}: {msg.content}</p>
+                <p>{msg.senderName}: {msg.content} {msg.timeStamp}</p>
             ))}
         </p>
         <input type="text" value={userName} onChange={handleUserNameInputChange} />
