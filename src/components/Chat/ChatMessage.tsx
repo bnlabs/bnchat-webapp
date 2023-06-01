@@ -1,11 +1,6 @@
 import { Avatar } from "@mantine/core";
 import { ReactNode } from "react";
 
-export type ChatMessageData = {
-	username: string;
-	message: string;
-};
-
 function ChatMessage({
 	username,
 	children,

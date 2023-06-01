@@ -1,4 +1,4 @@
-import ChatContainer from "./components/ChatContainer";
+import ChatContainer from "./components/Chat/ChatContainer";
 import { MantineProvider } from "@mantine/core";
 
 function App() {

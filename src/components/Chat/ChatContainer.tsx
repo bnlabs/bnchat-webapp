@@ -1,8 +1,13 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Button, Input } from "@mantine/core";
-import ChatMessage, { ChatMessageData } from "./ChatMessage";
-import socket from "../socket";
+import ChatMessage from "./ChatMessage";
+import socket from "../../socket";
 import ChatSender from "./ChatSender";
+
+type ChatMessageData = {
+	username: string;
+	message: string;
+};
 
 function ChatContainer() {
 	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
