@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { getConnection } from "./SignalRManager";
+import { getConnection } from "../SignalR/SignalRManager";
 import { HubConnection } from "@microsoft/signalr";
 
 const SignalRContext = createContext<HubConnection | null>(null);

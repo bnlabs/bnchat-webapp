@@ -9,7 +9,7 @@ import {
 import { Button, Input } from "@mantine/core";
 import ChatMessage from "./ChatMessage";
 import ChatSender from "./ChatSender";
-import SignalRContext from "../SignalRContext";
+import SignalRContext from "../SignalR/SignalRContext";
 
 type Message = {
 	senderId: string;
