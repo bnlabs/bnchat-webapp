@@ -1,11 +1,20 @@
-import './App.css'
+import ChatContainer from "./components/Chat/ChatContainer";
+import { MantineProvider } from "@mantine/core";
 
 function App() {
-
-  return (
-    <>
-    </>
-  )
+	
+	return (
+		<MantineProvider
+			withGlobalStyles
+			withNormalizeCSS
+			theme={{ colorScheme: "dark" }}
+		>
+			<div className="flex justify-center m-4">
+				<ChatContainer />
+			</div>
+		</MantineProvider>
+	);
 }
 
-export default App
+export default App;
+
