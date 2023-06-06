@@ -1,22 +1,34 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import {
+	FormEvent,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { Button, Input } from "@mantine/core";
 import ChatMessage from "./ChatMessage";
-import socket from "../../socket";
 import ChatSender from "./ChatSender";
+import SignalRContext from "../signalr/SignalRContext";
 
-type ChatMessageData = {
-	username: string;
-	message: string;
+type Message = {
+	senderId: string;
+	content: string;
+	senderName: string;
+	conversationId: string;
+	timeStamp: string;
+	id: string;
 };
 
 function ChatContainer() {
 	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
-	const [messageHistory, setMessageHistory] = useState<ChatMessageData[]>([]);
+	const [messageHistory, setMessageHistory] = useState<Message[]>([]);
 	const [username, setUsername] = useState<string>("");
+	const [conversationId, setConversationId] = useState<string>("");
 	const messageWindow = useRef<HTMLUListElement | null>(null);
 
 	const updateMessageHistory = useCallback(
-		(message: ChatMessageData) => {
+		(message: Message) => {
 			setMessageHistory((prevMessageHistory) => [
 				message,
 				...prevMessageHistory,
@@ -25,30 +37,23 @@ function ChatContainer() {
 		[setMessageHistory]
 	);
 
+	const connection = useContext(SignalRContext);
+
 	useEffect(() => {
-		function onConnect() {
-			setConnectionStatus("Open");
+		connection
+			?.start()
+			.then(() => {
+				console.log("Connected!");
+				connection.on("ReceiveMessage", onMessage);
+				setConnectionStatus("Open");
+			})
+			.catch((e) => console.log("Connection failed: ", e));
+
+		function onMessage(value: Message) {
+			console.log(value);
+			updateMessageHistory(value);
 		}
-
-		function onDisconnect() {
-			setConnectionStatus("Closed");
-		}
-
-		function onMessage(value: string) {
-			updateMessageHistory(JSON.parse(value));
-		}
-
-		socket.on("connect", onConnect);
-		socket.on("disconnect", onDisconnect);
-		socket.on("message", onMessage);
-
-		return () => {
-			socket.off("connect", onConnect);
-			socket.off("disconnect", onDisconnect);
-			socket.off("message", onMessage);
-			socket.disconnect();
-		};
-	}, [updateMessageHistory]);
+	}, [updateMessageHistory, connection]);
 
 	useEffect(() => {
 		messageWindow.current?.scrollTo(0, messageWindow.current.scrollHeight);
@@ -58,33 +63,69 @@ function ChatContainer() {
 		event.preventDefault();
 		if (event.currentTarget.message.value === "") return;
 
-		socket.emit("message", {
-			username: username,
-			message: event.currentTarget.message.value,
+		connection?.invoke("SendMessage", {
+			senderId: "310c993a-fa98-4929-a1ec-2af7bbae9ab0",
+			senderName: username,
+			content: event.currentTarget.message.value,
+			conversationId,
 		});
 	}
 
 	function handleSetUsername(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		socket.connect();
 		setUsername(event.currentTarget.username.value);
+	}
+
+	function handleSetConversationId(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		connection?.invoke("JoinGroup", event.currentTarget.conversationId.value);
+		setConversationId(event.currentTarget.conversationId.value);
 	}
 
 	return (
 		<div className="flex flex-1 max-w-5xl flex-col items-center p-4 bg-slate-950 rounded-xl">
 			<div>
-				<strong>Connection Status:</strong> {connectionStatus}
-				<div className="flex items-center">
-					<strong className="mr-2">Username:</strong>
-					<form className="flex" action="submit" onSubmit={handleSetUsername}>
+				<label className="mb-2">Connection Status: {connectionStatus}</label>
+				<div>
+					<form
+						className="flex items-center mb-2"
+						action="submit"
+						onSubmit={handleSetUsername}
+					>
+						<label className="mr-2">Username:</label>
 						<Input
-							className="mb-2 mr-2"
+							className="mr-2"
 							name="username"
 							disabled={username === "" ? false : true}
 							placeholder="Username"
 						></Input>
 						<Button type="submit" disabled={username === "" ? false : true}>
-							Connect
+							Set username
+						</Button>
+					</form>
+					<form
+						className="flex mb-2 items-center"
+						action="submit"
+						onSubmit={handleSetConversationId}
+					>
+						<label className="mr-2">Conversation:</label>
+						<Input
+							className="mr-2"
+							placeholder="Conversation"
+							name="conversationId"
+							disabled={
+								(conversationId === "" ? false : true) ||
+								(username === "" ? true : false)
+							}
+						></Input>
+						<Button
+							type="submit"
+							disabled={
+								(conversationId === "" ? false : true) ||
+								(username === "" ? true : false)
+							}
+						>
+							Join conversation
 						</Button>
 					</form>
 				</div>
@@ -97,8 +138,11 @@ function ChatContainer() {
 					{messageHistory.map((messageData, index) => {
 						return (
 							<li className="my-1" key={index.toString()}>
-								<ChatMessage username={messageData.username}>
-									{messageData.message}
+								<ChatMessage
+									username={messageData.senderName}
+									timestamp={messageData.timeStamp}
+								>
+									{messageData.content}
 								</ChatMessage>
 							</li>
 						);
@@ -107,7 +151,7 @@ function ChatContainer() {
 			</div>
 			<div className="flex justify-center rounded mt-2 bg-slate-800 p-2">
 				<ChatSender
-					disabled={connectionStatus !== "Open" || username === ""}
+					disabled={username === ""}
 					handleSendMessage={handleSendMessage}
 				/>
 			</div>
