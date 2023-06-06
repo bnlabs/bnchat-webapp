@@ -2,13 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { SignalRProvider } from "./components/signalr/SignalRContext.tsx";
+import { SignalRProvider } from "./components/SignalRContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-	<SignalRProvider>
-		<React.StrictMode>
+	<React.StrictMode>
+		<SignalRProvider>
 			<App />
-		</React.StrictMode>
-	</SignalRProvider>
+		</SignalRProvider>
+	</React.StrictMode>
 );
-
