@@ -28,8 +28,7 @@ function Login() {
 					},
 				}
 			)
-			.then((response: any) => {
-				console.log(JSON.stringify(response.data));
+			.then((response) => {
 				dispatch(actions.setUsername(response?.data.username));
 				setIsLoading(false);
 				navigate("/app");
