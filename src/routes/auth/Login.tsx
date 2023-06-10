@@ -3,7 +3,7 @@ import { FormEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../../redux/userSlice";
 import { RootState } from "../../redux/userStore";
-import axios from 'axios';
+import axios from "axios";
 
 function Login() {
 	const dispatch = useDispatch();
@@ -11,29 +11,27 @@ function Login() {
 
 	function handleLogin(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		const payload = JSON.stringify({
-				"email": event.currentTarget.username.value,
-				"password": event.currentTarget.password.value
+
+		axios
+			.post(
+				"http://localhost:5077/auth/login",
+				{
+					email: event.currentTarget.username.value,
+					password: event.currentTarget.password.value,
+				},
+				{
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			)
+			.then((response: any) => {
+				console.log(JSON.stringify(response.data));
+				dispatch(actions.setUsername(response?.data.username));
+			})
+			.catch((error: any) => {
+				console.log(error);
 			});
-
-			const config = {
-			method: 'post',
-			maxBodyLength: Infinity,
-			url: 'http://localhost:5077/auth/login',
-			headers: { 
-				'Content-Type': 'application/json'
-			},
-			data : payload
-			};
-
-			axios.request(config)
-				.then((response:any) => {
-					console.log(JSON.stringify(response.data));
-					dispatch(actions.setUsername(response?.data.username));
-				})
-				.catch((error:any) => {
-					console.log(error);
-				});
 	}
 
 	return (
