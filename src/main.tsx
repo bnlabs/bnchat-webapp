@@ -9,6 +9,7 @@ import { MantineProvider } from "@mantine/core";
 import Chat from "./routes/Chat.tsx";
 import { Provider } from "react-redux";
 import userStore from "./redux/userStore.ts";
+import { Toaster } from 'react-hot-toast';
 
 const router = createBrowserRouter([
 	{
@@ -43,6 +44,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 					theme={{ colorScheme: "dark" }}
 				>
 					<RouterProvider router={router} />
+					<Toaster />
 				</MantineProvider>
 			</Provider>
 		</SignalRProvider>
