@@ -9,11 +9,6 @@ function Login() {
 	const dispatch = useDispatch();
 	const username = useSelector((state: RootState) => state.user.username);
 
-	function handleSetUsername(event: FormEvent<HTMLFormElement>) {
-		event.preventDefault();
-		dispatch(actions.setUsername(event.currentTarget.username.value));
-	}
-
 	function handleLogin(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		const payload = JSON.stringify({
