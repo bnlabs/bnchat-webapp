@@ -3,10 +3,24 @@ import { FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { actions } from "../../redux/userSlice";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-function Login() {
+type Credentials = {
+	email: string;
+	password: string;
+};
+
+async function loginUser(credentials: Credentials) {
+	return await axios.post("http://localhost:5077/auth/login", credentials, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+}
+
+export default function Login() {
 	const dispatch = useDispatch();
 	const [isLoading, setIsLoading] = useState(false);
 	const navigate = useNavigate();
@@ -15,39 +29,37 @@ function Login() {
 		event.preventDefault();
 		setIsLoading(true);
 
-		axios
-			.post(
-				"http://localhost:5077/auth/login",
-				{
-					email: event.currentTarget.email.value,
-					password: event.currentTarget.password.value,
-				},
-				{
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			)
-			.then((response) => {
-				dispatch(actions.setUsername(response?.data.username));
-				setIsLoading(false);
-				navigate("/app");
-			})
-			.catch((error: Error) => {
-				toast.error(error.message, {
-					style: {
-						background: "#333",
-						color: "#fff",
-					},
-				});
+		toast.promise(
+			loginUser({
+				email: event.currentTarget.email.value,
+				password: event.currentTarget.password.value,
+			}),
+			{
+				loading: "Loading...",
+				success: (response) => {
+					dispatch(actions.setUsername(response.data.username));
+					setIsLoading(false);
+					navigate("/app");
 
-				setIsLoading(false);
-			});
+					return "Logged in successfully!";
+				},
+				error: (error) => {
+					setIsLoading(false);
+					return error.message;
+				},
+			},
+			{
+				style: {
+					background: "#333",
+					color: "#fff",
+				},
+			}
+		);
 	}
 
 	return (
 		<div className="flex items-center justify-center min-h-screen">
-			<div className="p-8 text-left bg-gray-800 rounded shadow-lg">
+			<div className="p-8 text-left bg-gray-800 rounded shadow-xl">
 				<p className="mt-0 text-2xl font-bold text-center">
 					Login to your account
 				</p>
@@ -63,15 +75,17 @@ function Login() {
 								placeholder="Password"
 							/>
 						</div>
-						<div className="flex mt-4 justify-end">
-							<Button type="submit" className="mr-2" loading={isLoading}>
+						<div className="flex mt-4 justify-center gap-2">
+							<Button
+								variant="outline"
+								disabled={isLoading}
+								onClick={() => navigate("/auth/signup")}
+							>
+								Signup
+							</Button>
+							<Button type="submit" disabled={isLoading}>
 								Login
 							</Button>
-							<Link to="/auth/signup">
-								<Button variant="outline" disabled={isLoading}>
-									Signup
-								</Button>
-							</Link>
 						</div>
 					</div>
 				</form>
@@ -79,5 +93,3 @@ function Login() {
 		</div>
 	);
 }
-
-export default Login;
