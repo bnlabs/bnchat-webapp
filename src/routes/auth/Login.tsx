@@ -6,13 +6,15 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
+const url = import.meta.env.VITE_API_URL;
+
 type Credentials = {
 	email: string;
 	password: string;
 };
 
 async function loginUser(credentials: Credentials) {
-	return await axios.post("http://localhost:5077/auth/login", credentials, {
+	return await axios.post(`${url}auth/login`, credentials, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -71,7 +73,6 @@ export default function Login() {
 						<div className="mt-4">
 							<PasswordInput
 								name="password"
-								type="password"
 								placeholder="Password"
 							/>
 						</div>
