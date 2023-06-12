@@ -15,7 +15,6 @@ type Credentials = {
 
 async function loginUser(credentials: Credentials) {
 	return await axios.post(`${url}auth/login`, credentials, {
-		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
