@@ -1,7 +1,7 @@
 import { Avatar } from "@mantine/core";
 import { ReactNode } from "react";
 
-function ChatMessage({
+const ChatMessage = ({
 	username,
 	timestamp,
 	children,
@@ -9,7 +9,7 @@ function ChatMessage({
 	username: string;
 	timestamp: string;
 	children?: ReactNode;
-}) {
+}) => {
 	return (
 		<div className="bg-slate-900 p-2 rounded-xl">
 			<div className="flex items-center">
@@ -26,6 +26,6 @@ function ChatMessage({
 			<div className="break-words">{children ?? ""}</div>
 		</div>
 	);
-}
+};
 
 export default ChatMessage;

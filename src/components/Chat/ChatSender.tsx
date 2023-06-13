@@ -1,13 +1,13 @@
 import { Button, Input } from "@mantine/core";
 import { FormEvent, useState } from "react";
 
-function ChatSender({
+const ChatSender = ({
 	handleSendMessage,
 	disabled,
 }: {
 	handleSendMessage: (event: FormEvent<HTMLFormElement>) => void;
 	disabled: boolean;
-}) {
+}) => {
 	const [message, setMessage] = useState<string>("");
 
 	function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -31,6 +31,6 @@ function ChatSender({
 			</Button>
 		</form>
 	);
-}
+};
 
 export default ChatSender;

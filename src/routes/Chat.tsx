@@ -20,7 +20,7 @@ type MessagePayload = {
 	id: string;
 };
 
-function Chat() {
+const Chat = () => {
 	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
 	const [messageHistory, setMessageHistory] = useState<MessagePayload[]>([]);
 	const [username, setUsername] = useState<string>("");
@@ -157,6 +157,6 @@ function Chat() {
 			</div>
 		</div>
 	);
-}
+};
 
 export default Chat;

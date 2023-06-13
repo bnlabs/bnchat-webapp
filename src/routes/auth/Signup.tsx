@@ -1,4 +1,4 @@
-function Signup() {
+const Signup = () => {
 	return (
 		<div>
 			Signup

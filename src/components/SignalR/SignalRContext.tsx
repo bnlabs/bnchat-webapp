@@ -4,7 +4,11 @@ import { HubConnection } from "@microsoft/signalr";
 
 const SignalRContext = createContext<HubConnection | null>(null);
 
-export function SignalRProvider({ children }: { children: React.ReactNode }) {
+export const SignalRProvider = ({
+	children,
+}: {
+	children: React.ReactNode;
+}) => {
 	const connection = getConnection();
 
 	return (
@@ -12,6 +16,6 @@ export function SignalRProvider({ children }: { children: React.ReactNode }) {
 			{children}
 		</SignalRContext.Provider>
 	);
-}
+};
 
 export default SignalRContext;

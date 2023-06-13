@@ -13,18 +13,18 @@ type Credentials = {
 	password: string;
 };
 
-async function loginUser(credentials: Credentials) {
+const loginUser = async (credentials: Credentials) => {
 	return await axios.post(`${url}/auth/login`, credentials, {
 		withCredentials: true,
 	});
 }
 
-export default function Login() {
+const Login = () => {
 	const dispatch = useDispatch();
 	const [isLoading, setIsLoading] = useState(false);
 	const navigate = useNavigate();
 
-	function handleLogin(event: FormEvent<HTMLFormElement>) {
+	const handleLogin = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setIsLoading(true);
 
@@ -54,7 +54,7 @@ export default function Login() {
 				},
 			}
 		);
-	}
+	};
 
 	return (
 		<div className="flex items-center justify-center min-h-screen">
@@ -68,10 +68,7 @@ export default function Login() {
 							<TextInput name="email" type="email" placeholder="Email" />
 						</div>
 						<div className="mt-4">
-							<PasswordInput
-								name="password"
-								placeholder="Password"
-							/>
+							<PasswordInput name="password" placeholder="Password" />
 						</div>
 						<div className="flex mt-4 justify-center gap-2">
 							<Button
@@ -90,4 +87,6 @@ export default function Login() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default Login;
