@@ -47,6 +47,9 @@ jobs:
         run: |
           npm install -g pnpm
           pnpm install
+      
+      - name: Set .env
+        run: echo ${{ secrets.ENV_FILE }} >> .env
 
       - name: Build app
         run: pnpm run build
