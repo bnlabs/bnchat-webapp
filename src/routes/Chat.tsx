@@ -96,10 +96,13 @@ const Chat = () => {
 						<Input
 							className="mr-2"
 							name="username"
-							disabled={username === "" ? false : true}
+							disabled={username !== "" || connectionStatus === "Closed"}
 							placeholder="Username"
 						></Input>
-						<Button type="submit" disabled={username === "" ? false : true}>
+						<Button
+							type="submit"
+							disabled={username !== "" || connectionStatus === "Closed"}
+						>
 							Set username
 						</Button>
 					</form>
@@ -113,17 +116,11 @@ const Chat = () => {
 							className="mr-2"
 							placeholder="Conversation"
 							name="conversationId"
-							disabled={
-								(conversationId === "" ? false : true) ||
-								(username === "" ? true : false)
-							}
+							disabled={username === "" || connectionStatus === "Closed"}
 						></Input>
 						<Button
 							type="submit"
-							disabled={
-								(conversationId === "" ? false : true) ||
-								(username === "" ? true : false)
-							}
+							disabled={username === "" || connectionStatus === "Closed"}
 						>
 							Join conversation
 						</Button>
@@ -151,7 +148,7 @@ const Chat = () => {
 			</div>
 			<div className="flex justify-center rounded mt-2 bg-slate-800 p-2">
 				<ChatSender
-					disabled={username === ""}
+					disabled={username === "" || connectionStatus === "Closed"}
 					handleSendMessage={handleSendMessage}
 				/>
 			</div>
