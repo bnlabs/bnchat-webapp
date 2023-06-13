@@ -10,6 +10,9 @@ import Chat from "./routes/Chat.tsx";
 import { Provider } from "react-redux";
 import userStore from "./redux/userStore.ts";
 import { Toaster } from "react-hot-toast";
+import axios from "axios";
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const router = createBrowserRouter([
 	{
@@ -22,6 +25,20 @@ const router = createBrowserRouter([
 				<Link to="/auth/login">
 					<Button>Login</Button>
 				</Link>
+				<Button
+					onClick={() => {
+						axios
+							.get(
+								`${apiUrl}/api/Message/getConversation?userId=2d0864cb-b289-4789-8bd6-8e451855a426`
+							)
+							.then((response) => {
+								console.log(response.data);
+							})
+							.catch((error) => {
+								console.log(error);
+							});
+					}}
+				>Test endpoint</Button>
 			</div>
 		),
 	},
