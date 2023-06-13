@@ -1,20 +1,7 @@
-import ChatContainer from "./components/Chat/ChatContainer";
-import { MantineProvider } from "@mantine/core";
+import Chat from "./routes/Chat";
 
 function App() {
-	
-	return (
-		<MantineProvider
-			withGlobalStyles
-			withNormalizeCSS
-			theme={{ colorScheme: "dark" }}
-		>
-			<div className="flex justify-center m-4">
-				<ChatContainer />
-			</div>
-		</MantineProvider>
-	);
+	return <Chat />;
 }
 
 export default App;
-

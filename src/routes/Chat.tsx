@@ -7,11 +7,11 @@ import {
 	useState,
 } from "react";
 import { Button, Input } from "@mantine/core";
-import ChatMessage from "./ChatMessage";
-import ChatSender from "./ChatSender";
-import SignalRContext from "../SignalR/SignalRContext";
+import ChatMessage from "../components/Chat/ChatMessage";
+import ChatSender from "../components/Chat/ChatSender";
+import SignalRContext from "../components/SignalR/SignalRContext";
 
-type Message = {
+type MessagePayload = {
 	senderId: string;
 	content: string;
 	senderName: string;
@@ -20,15 +20,15 @@ type Message = {
 	id: string;
 };
 
-function ChatContainer() {
+function Chat() {
 	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
-	const [messageHistory, setMessageHistory] = useState<Message[]>([]);
+	const [messageHistory, setMessageHistory] = useState<MessagePayload[]>([]);
 	const [username, setUsername] = useState<string>("");
 	const [conversationId, setConversationId] = useState<string>("");
 	const messageWindow = useRef<HTMLUListElement | null>(null);
 
 	const updateMessageHistory = useCallback(
-		(message: Message) => {
+		(message: MessagePayload) => {
 			setMessageHistory((prevMessageHistory) => [
 				message,
 				...prevMessageHistory,
@@ -49,7 +49,7 @@ function ChatContainer() {
 			})
 			.catch((e) => console.log("Connection failed: ", e));
 
-		function onMessage(value: Message) {
+		function onMessage(value: MessagePayload) {
 			console.log(value);
 			updateMessageHistory(value);
 		}
@@ -159,4 +159,4 @@ function ChatContainer() {
 	);
 }
 
-export default ChatContainer;
+export default Chat;
