@@ -1,20 +1,29 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Link, RouterProvider } from "react-router-dom";
 import { SignalRProvider } from "./components/SignalR/SignalRContext.tsx";
 import Login from "./routes/auth/Login.tsx";
 import Signup from "./routes/auth/Signup.tsx";
-import { MantineProvider } from "@mantine/core";
+import { Button, MantineProvider } from "@mantine/core";
 import Chat from "./routes/Chat.tsx";
 import { Provider } from "react-redux";
 import userStore from "./redux/userStore.ts";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <div>What are you doing here lol</div>,
+		element: (
+			<div className="flex justify-center h-screen items-center gap-2">
+				<Link to="/app">
+					<Button>Chat</Button>
+				</Link>
+				<Link to="/auth/login">
+					<Button>Login</Button>
+				</Link>
+			</div>
+		),
 	},
 	{
 		path: "/app",
