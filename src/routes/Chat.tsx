@@ -16,7 +16,7 @@ type MessagePayload = {
 	content: string;
 	senderName: string;
 	conversationId: string;
-	timeStamp: string;
+	timestamp: string;
 	id: string;
 };
 
@@ -140,7 +140,7 @@ function Chat() {
 							<li className="my-1" key={index.toString()}>
 								<ChatMessage
 									username={messageData.senderName}
-									timestamp={messageData.timeStamp}
+									timestamp={messageData.timestamp}
 								>
 									{messageData.content}
 								</ChatMessage>

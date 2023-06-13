@@ -6,7 +6,7 @@ const url = import.meta.env.VITE_API_URL;
 export function getConnection() {
 	if (!connection) {
 		connection = new signalR.HubConnectionBuilder()
-			.withUrl(`${url}message-hub`, {
+			.withUrl(`${url}/message-hub`, {
 				skipNegotiation: true,
 				transport: signalR.HttpTransportType.WebSockets,
 			})
