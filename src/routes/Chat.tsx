@@ -83,7 +83,7 @@ const Chat = () => {
 	}
 
 	return (
-		<div className="flex flex-1 max-w-5xl flex-col items-center p-4 bg-slate-950 rounded-xl">
+		<div className="flex flex-1  flex-col items-center p-4 bg-slate-950 rounded-xl">
 			<div>
 				<label className="mb-2">Connection Status: {connectionStatus}</label>
 				<div>
@@ -130,10 +130,10 @@ const Chat = () => {
 					</form>
 				</div>
 			</div>
-			<div className="flex flex-1 w-full rounded bg-slate-800">
+			<div className="flex flex-1 overflow-hidden w-full rounded bg-slate-800">
 				<ul
 					ref={messageWindow}
-					className="flex flex-col-reverse m-0 flex-1 h-96 p-2 overflow-y-scroll list-none no-scrollbar"
+					className="flex flex-col-reverse overflow-y-scroll no-scrollbar m-0 flex-1 p-2  list-none "
 				>
 					{messageHistory.map((messageData, index) => {
 						return (
