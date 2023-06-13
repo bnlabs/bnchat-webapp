@@ -29,7 +29,10 @@ const router = createBrowserRouter([
 					onClick={() => {
 						axios
 							.get(
-								`${apiUrl}/api/Message/getConversation?userId=2d0864cb-b289-4789-8bd6-8e451855a426`
+								`${apiUrl}/api/Message/getConversation?userId=2d0864cb-b289-4789-8bd6-8e451855a426`,
+								{
+									withCredentials: true,
+								}
 							)
 							.then((response) => {
 								console.log(response.data);
@@ -38,7 +41,9 @@ const router = createBrowserRouter([
 								console.log(error);
 							});
 					}}
-				>Test endpoint</Button>
+				>
+					Test endpoint
+				</Button>
 			</div>
 		),
 	},
