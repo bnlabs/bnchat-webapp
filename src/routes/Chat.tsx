@@ -10,6 +10,8 @@ import { Button, Input } from "@mantine/core";
 import ChatMessage from "../components/Chat/ChatMessage";
 import ChatSender from "../components/Chat/ChatSender";
 import SignalRContext from "../components/SignalR/SignalRContext";
+import axios from "axios";
+import useUserSelector from "../hooks/useUserSelector";
 
 type MessagePayload = {
 	senderId: string;
@@ -20,12 +22,22 @@ type MessagePayload = {
 	id: string;
 };
 
+type ConversationPayload = {
+	conversationId: string;
+	memberIds: string[];
+	messages: MessagePayload[];
+};
+
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const Chat = () => {
 	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
 	const [messageHistory, setMessageHistory] = useState<MessagePayload[]>([]);
+	const [conversations, setConversations] = useState<ConversationPayload[]>([]);
 	const [username, setUsername] = useState<string>("");
 	const [conversationId, setConversationId] = useState<string>("");
 	const messageWindow = useRef<HTMLUListElement | null>(null);
+	const user = useUserSelector();
 
 	const updateMessageHistory = useCallback(
 		(message: MessagePayload) => {
@@ -59,12 +71,23 @@ const Chat = () => {
 		messageWindow.current?.scrollTo(0, messageWindow.current.scrollHeight);
 	}, [messageHistory]);
 
+	useEffect(() => {
+		axios
+			.get(`${apiUrl}/Message/getConversation?userId=${user.id}`, {
+				withCredentials: true,
+			})
+			.then((response) => {
+				console.log(response.data);
+				setConversations(response.data);
+			});
+	}, [user.id]);
+
 	function handleSendMessage(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		if (event.currentTarget.message.value === "") return;
 
 		connection?.invoke("SendMessage", {
-			senderId: "310c993a-fa98-4929-a1ec-2af7bbae9ab0",
+			senderId: "2d0864cb-b289-4789-8bd6-8e451855a426",
 			senderName: username,
 			content: event.currentTarget.message.value,
 			conversationId,
@@ -84,7 +107,27 @@ const Chat = () => {
 
 	return (
 		<>
-			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden"></div>
+			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden">
+				<ul className="list-none">
+					{conversations.map((conversation) => (
+						<li key={conversation.conversationId}>
+							<button
+								onClick={() => {
+									connection?.invoke("JoinGroup", conversation.conversationId);
+									setConversationId(conversation.conversationId);
+									setMessageHistory(
+										conversation.messages.sort((a, b) => {
+											return a.timestamp > b.timestamp ? -1 : 1;
+										})
+									);
+								}}
+							>
+								{conversation.conversationId}
+							</button>
+						</li>
+					))}
+				</ul>
+			</div>
 			<div className="flex flex-1 flex-col items-center p-4 bg-slate-950 rounded-xl">
 				<div>
 					<label className="mb-2">Connection Status: {connectionStatus}</label>
@@ -132,7 +175,7 @@ const Chat = () => {
 				<div className="flex flex-1 overflow-hidden w-full rounded bg-slate-800">
 					<ul
 						ref={messageWindow}
-						className="flex flex-col-reverse overflow-y-scroll no-scrollbar m-0 flex-1 p-2  list-none "
+						className="flex flex-col-reverse overflow-y-scroll no-scrollbar m-0 flex-1 p-2  list-none"
 					>
 						{messageHistory.map((messageData, index) => {
 							return (
