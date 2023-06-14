@@ -58,7 +58,7 @@ jobs:
           app-name: 'toff-dev'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_032F113F86544C92BE13ABE74C88309B }}
-          package: dist
+          package: .
           
       - name: Clean up Artifacts
         uses: geekyeggo/delete-artifact@v2
