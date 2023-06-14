@@ -47,6 +47,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: node-app
+          
+      - name: ls
+        run: ls
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -55,7 +58,7 @@ jobs:
           app-name: 'toff-dev'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_032F113F86544C92BE13ABE74C88309B }}
-          package: .
+          package: dist
           
       - name: Clean up Artifacts
         uses: geekyeggo/delete-artifact@v2
