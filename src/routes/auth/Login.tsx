@@ -36,7 +36,10 @@ const Login = () => {
 			{
 				loading: "Loading...",
 				success: (response) => {
-					dispatch(actions.setUsername(response.data.username));
+					dispatch(actions.setUser({
+						username: response.data.username,
+						id: response.data.id
+					}));
 					setIsLoading(false);
 					navigate("/app");
 
