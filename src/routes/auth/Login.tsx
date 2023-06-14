@@ -1,7 +1,7 @@
 import { Button, PasswordInput, TextInput } from "@mantine/core";
 import { FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { actions } from "../../redux/userSlice";
+import { setUser } from "../../redux/userSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -17,7 +17,7 @@ const loginUser = async (credentials: Credentials) => {
 	return await axios.post(`${url}/auth/login`, credentials, {
 		withCredentials: true,
 	});
-}
+};
 
 const Login = () => {
 	const dispatch = useDispatch();
@@ -36,10 +36,8 @@ const Login = () => {
 			{
 				loading: "Loading...",
 				success: (response) => {
-					dispatch(actions.setUser({
-						username: response.data.username,
-						id: response.data.id
-					}));
+					const { username, id } = response.data;
+					dispatch(setUser({ username, id }));
 					setIsLoading(false);
 					navigate("/app");
 
