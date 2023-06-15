@@ -61,10 +61,10 @@ const Chat = () => {
 			})
 			.catch((e) => console.log("Connection failed: ", e));
 
-		function onMessage(value: MessagePayload) {
+		const onMessage = (value: MessagePayload) => {
 			console.log(value);
 			updateMessageHistory(value);
-		}
+		};
 	}, [updateMessageHistory, connection]);
 
 	useEffect(() => {
@@ -82,7 +82,7 @@ const Chat = () => {
 			});
 	}, [user.id]);
 
-	function handleSendMessage(event: FormEvent<HTMLFormElement>) {
+	const handleSendMessage = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (event.currentTarget.message.value === "") return;
 
@@ -92,18 +92,18 @@ const Chat = () => {
 			content: event.currentTarget.message.value,
 			conversationId,
 		});
-	}
+	};
 
-	function handleSetUsername(event: FormEvent<HTMLFormElement>) {
+	const handleSetUsername = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setUsername(event.currentTarget.username.value);
-	}
+	};
 
-	function handleSetConversationId(event: FormEvent<HTMLFormElement>) {
+	const handleSetConversationId = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		connection?.invoke("JoinGroup", event.currentTarget.conversationId.value);
 		setConversationId(event.currentTarget.conversationId.value);
-	}
+	};
 
 	return (
 		<>

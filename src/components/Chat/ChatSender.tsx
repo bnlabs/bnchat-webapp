@@ -10,10 +10,10 @@ const ChatSender = ({
 }) => {
 	const [message, setMessage] = useState<string>("");
 
-	function handleSubmit(event: FormEvent<HTMLFormElement>) {
+	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		setMessage("");
 		handleSendMessage(event);
-	}
+	};
 
 	return (
 		<form className="flex flex-1" action="submit" onSubmit={handleSubmit}>
