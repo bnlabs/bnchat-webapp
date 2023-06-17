@@ -27,7 +27,7 @@ const Login = () => {
 					const { username, id } = response.data;
 					dispatch(setUser({ username, id }));
 					setIsLoading(false);
-					navigate("/app");
+					navigate("/chat");
 
 					return "Logged in successfully!";
 				},
