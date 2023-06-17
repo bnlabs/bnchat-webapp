@@ -10,8 +10,8 @@ import { Button, Input } from "@mantine/core";
 import ChatMessage from "../components/Chat/ChatMessage";
 import ChatSender from "../components/Chat/ChatSender";
 import SignalRContext from "../components/SignalR/SignalRContext";
-import axios from "axios";
 import useUserSelector from "../hooks/useUserSelector";
+import { ApiClient } from "../utils/api";
 
 type MessagePayload = {
 	senderId: string;
@@ -27,8 +27,6 @@ type ConversationPayload = {
 	memberIds: string[];
 	messages: MessagePayload[];
 };
-
-const apiUrl = import.meta.env.VITE_API_URL;
 
 const Chat = () => {
 	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
@@ -72,14 +70,14 @@ const Chat = () => {
 	}, [messageHistory]);
 
 	useEffect(() => {
-		axios
-			.get(`${apiUrl}/Message/getConversation?userId=${user.id}`, {
-				withCredentials: true,
-			})
-			.then((response) => {
-				console.log(response.data);
-				setConversations(response.data);
-			});
+		ApiClient.get("/Message/getConversation", {
+			params: {
+				userId: user.id,
+			},
+		}).then((response) => {
+			console.log(response.data);
+			setConversations(response.data);
+		});
 	}, [user.id]);
 
 	const handleSendMessage = (event: FormEvent<HTMLFormElement>) => {

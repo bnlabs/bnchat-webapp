@@ -2,22 +2,10 @@ import { Button, PasswordInput, TextInput } from "@mantine/core";
 import { FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/userSlice";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-const url = import.meta.env.VITE_API_URL;
-
-type Credentials = {
-	email: string;
-	password: string;
-};
-
-const loginUser = async (credentials: Credentials) => {
-	return await axios.post(`${url}/auth/login`, credentials, {
-		withCredentials: true,
-	});
-};
+import { ApiClient } from "../../utils/api";
 
 const Login = () => {
 	const dispatch = useDispatch();
@@ -29,7 +17,7 @@ const Login = () => {
 		setIsLoading(true);
 
 		toast.promise(
-			loginUser({
+			ApiClient.post("/auth/login", {
 				email: event.currentTarget.email.value,
 				password: event.currentTarget.password.value,
 			}),
@@ -91,3 +79,4 @@ const Login = () => {
 };
 
 export default Login;
+
