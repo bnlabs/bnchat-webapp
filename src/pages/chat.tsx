@@ -104,7 +104,7 @@ const Chat = () => {
 	};
 
 	return (
-		<>
+		<div className="flex justify-center p-4 h-screen">
 			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden">
 				<ul className="list-none">
 					{conversations.map((conversation) => (
@@ -196,7 +196,7 @@ const Chat = () => {
 					/>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

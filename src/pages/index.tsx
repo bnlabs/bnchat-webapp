@@ -7,7 +7,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const Index = () => {
 	return (
 		<div className="flex justify-center h-screen items-center gap-2">
-			<Link to="/app">
+			<Link to="/chat">
 				<Button>Chat</Button>
 			</Link>
 			<Link to="/auth/login">

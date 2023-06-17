@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",
+    "@generouted/react-router": "^1.13.3",
     "@mantine/carousel": "^6.0.13",
     "@mantine/core": "^6.0.13",
     "@mantine/dates": "^6.0.13",
