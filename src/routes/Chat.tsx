@@ -12,6 +12,9 @@ import ChatSender from "../components/Chat/ChatSender";
 import SignalRContext from "../components/SignalR/SignalRContext";
 import axios from "axios";
 import useUserSelector from "../hooks/useUserSelector";
+import useConversationSelector from "../hooks/useConversationSelector";
+import { useSelector, useDispatch } from "react-redux";
+import { addConversation, addMessage } from "../redux/conversationSlice";
 
 type MessagePayload = {
 	senderId: string;
@@ -26,7 +29,9 @@ type ConversationPayload = {
 	conversationId: string;
 	memberIds: string[];
 	messages: MessagePayload[];
+	memberMap: Map<string,string>;
 };
+
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -34,10 +39,12 @@ const Chat = () => {
 	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
 	const [messageHistory, setMessageHistory] = useState<MessagePayload[]>([]);
 	const [conversations, setConversations] = useState<ConversationPayload[]>([]);
-	const [username, setUsername] = useState<string>("");
+	// const [username, setUsername] = useState<string>("");
 	const [conversationId, setConversationId] = useState<string>("");
 	const messageWindow = useRef<HTMLUListElement | null>(null);
+	const Dispatch = useDispatch();
 	const user = useUserSelector();
+	const convo = useConversationSelector();
 
 	const updateMessageHistory = useCallback(
 		(message: MessagePayload) => {
@@ -63,6 +70,7 @@ const Chat = () => {
 
 		const onMessage = (value: MessagePayload) => {
 			console.log(value);
+			Dispatch(addMessage(value));
 			updateMessageHistory(value);
 		};
 	}, [updateMessageHistory, connection]);
@@ -79,6 +87,9 @@ const Chat = () => {
 			.then((response) => {
 				console.log(response.data);
 				setConversations(response.data);
+				response.data.forEach(function (value:ConversationPayload) {
+					Dispatch(addConversation(value));
+				});
 			});
 	}, [user.id]);
 
@@ -87,17 +98,13 @@ const Chat = () => {
 		if (event.currentTarget.message.value === "") return;
 
 		connection?.invoke("SendMessage", {
-			senderId: "2d0864cb-b289-4789-8bd6-8e451855a426",
-			senderName: username,
+			senderId: user.id,
+			senderName: user.username,
 			content: event.currentTarget.message.value,
 			conversationId,
 		});
 	};
 
-	const handleSetUsername = (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		setUsername(event.currentTarget.username.value);
-	};
 
 	const handleSetConversationId = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -132,32 +139,14 @@ const Chat = () => {
 				<div>
 					<label className="mb-2">Connection Status: {connectionStatus}</label>
 					<div>
-						<form
-							className="flex items-center mb-2"
-							action="submit"
-							onSubmit={handleSetUsername}
-						>
-							<label className="mr-2">Username:</label>
-							<Input
-								className="mr-2"
-								name="username"
-								disabled={username !== "" || connectionStatus === "Closed"}
-								placeholder="Username"
-							></Input>
-							<Button
-								type="submit"
-								disabled={username !== "" || connectionStatus === "Closed"}
-							>
-								Set username
-							</Button>
-						</form>
+						<p>Username: {user.username}</p>
 						<form
 							className="flex mb-2 items-center"
 							action="submit"
 							onSubmit={handleSetConversationId}
 						>
 							<label className="mr-2">Conversation:</label>
-							<Input
+							{/* <Input
 								className="mr-2"
 								placeholder="Conversation"
 								name="conversationId"
@@ -168,7 +157,7 @@ const Chat = () => {
 								disabled={username === "" || connectionStatus === "Closed"}
 							>
 								Join conversation
-							</Button>
+							</Button> */}
 						</form>
 					</div>
 				</div>
@@ -193,7 +182,7 @@ const Chat = () => {
 				</div>
 				<div className="flex w-full justify-center rounded mt-2 bg-slate-800 p-2">
 					<ChatSender
-						disabled={username === "" || connectionStatus === "Closed"}
+						disabled={false}
 						handleSendMessage={handleSendMessage}
 					/>
 				</div>
