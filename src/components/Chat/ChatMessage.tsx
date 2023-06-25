@@ -19,7 +19,11 @@ const ChatMessage = ({
 				</div>
 				<div>
 					<span className="text-xs text-gray-400">
-						{new Date(timestamp).toLocaleTimeString()}
+						{new Date(timestamp).toLocaleTimeString()} 
+						{' '}
+						{new Date(timestamp).getMonth()}/
+						{new Date(timestamp).getDate()}/
+						{new Date(timestamp).getFullYear()}
 					</span>
 				</div>
 			</div>

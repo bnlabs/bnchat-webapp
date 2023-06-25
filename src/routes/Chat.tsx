@@ -85,7 +85,6 @@ const Chat = () => {
 			})
 			.then((response) => {
 				setConversations(response.data);
-				console.log(response.data);
 				setConversationId(response.data[0].id);
 				response.data.forEach(function (value:ConversationPayload) {
 					value.messages.forEach((msg) => {
@@ -134,11 +133,6 @@ const Chat = () => {
 								onClick={() => {
 									connection?.invoke("JoinGroup", conversation.conversationId);
 									setConversationId(conversation.conversationId);
-									// setMessageHistory(
-									// 	conversation.messages.sort((a, b) => {
-									// 		return a.timestamp > b.timestamp ? -1 : 1;
-									// 	})
-									// );
 								}}
 							>
 								{recipientName}
@@ -158,18 +152,6 @@ const Chat = () => {
 							onSubmit={handleSetConversationId}
 						>
 							<label className="mr-2">Conversation: {conversationId}</label>
-							{/* <Input
-								className="mr-2"
-								placeholder="Conversation"
-								name="conversationId"
-								disabled={username === "" || connectionStatus === "Closed"}
-							></Input>
-							<Button
-								type="submit"
-								disabled={username === "" || connectionStatus === "Closed"}
-							>
-								Join conversation
-							</Button> */}
 						</form>
 					</div>
 				</div>
