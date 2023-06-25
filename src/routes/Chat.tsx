@@ -88,6 +88,9 @@ const Chat = () => {
 				console.log(response.data);
 				setConversationId(response.data[0].id);
 				response.data.forEach(function (value:ConversationPayload) {
+					value.messages.forEach((msg) => {
+						msg.senderName = value.memberMap[msg.senderId];
+					})
 					Dispatch(addConversation(value));
 				});
 			});
