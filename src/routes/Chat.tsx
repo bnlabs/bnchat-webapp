@@ -29,7 +29,7 @@ type ConversationPayload = {
 	conversationId: string;
 	memberIds: string[];
 	messages: MessagePayload[];
-	memberMap: Map<string,string>;
+	memberMap: any;
 };
 
 
@@ -40,17 +40,17 @@ const Chat = () => {
 	const [messageHistory, setMessageHistory] = useState<MessagePayload[]>([]);
 	const [conversations, setConversations] = useState<ConversationPayload[]>([]);
 	// const [username, setUsername] = useState<string>("");
-	const [conversationId, setConversationId] = useState<string>("");
+	const convo = useConversationSelector();
+	const [conversationId, setConversationId] = useState<string>();
 	const messageWindow = useRef<HTMLUListElement | null>(null);
 	const Dispatch = useDispatch();
 	const user = useUserSelector();
-	const convo = useConversationSelector();
 
 	const updateMessageHistory = useCallback(
 		(message: MessagePayload) => {
 			setMessageHistory((prevMessageHistory) => [
-				message,
 				...prevMessageHistory,
+				message
 			]);
 		},
 		[setMessageHistory]
@@ -69,7 +69,6 @@ const Chat = () => {
 			.catch((e) => console.log("Connection failed: ", e));
 
 		const onMessage = (value: MessagePayload) => {
-			console.log(value);
 			Dispatch(addMessage(value));
 			updateMessageHistory(value);
 		};
@@ -85,8 +84,9 @@ const Chat = () => {
 				withCredentials: true,
 			})
 			.then((response) => {
-				console.log(response.data);
 				setConversations(response.data);
+				console.log(response.data);
+				setConversationId(response.data[0].id);
 				response.data.forEach(function (value:ConversationPayload) {
 					Dispatch(addConversation(value));
 				});
@@ -116,23 +116,32 @@ const Chat = () => {
 		<>
 			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden">
 				<ul className="list-none">
-					{conversations.map((conversation) => (
+					{conversations.map((conversation) => {
+						let recipientName = '';
+						for (const key in conversation.memberMap) {
+							if (key !== user.id) {
+							const value = conversation.memberMap[key];
+							recipientName = value;
+							break;
+							}
+						}
+						return (
 						<li key={conversation.conversationId}>
 							<button
 								onClick={() => {
 									connection?.invoke("JoinGroup", conversation.conversationId);
 									setConversationId(conversation.conversationId);
-									setMessageHistory(
-										conversation.messages.sort((a, b) => {
-											return a.timestamp > b.timestamp ? -1 : 1;
-										})
-									);
+									// setMessageHistory(
+									// 	conversation.messages.sort((a, b) => {
+									// 		return a.timestamp > b.timestamp ? -1 : 1;
+									// 	})
+									// );
 								}}
 							>
-								{conversation.conversationId}
+								{recipientName}
 							</button>
 						</li>
-					))}
+					)})}
 				</ul>
 			</div>
 			<div className="flex flex-1 flex-col items-center p-4 bg-slate-950 rounded-xl">
@@ -145,7 +154,7 @@ const Chat = () => {
 							action="submit"
 							onSubmit={handleSetConversationId}
 						>
-							<label className="mr-2">Conversation:</label>
+							<label className="mr-2">Conversation: {conversationId}</label>
 							{/* <Input
 								className="mr-2"
 								placeholder="Conversation"
@@ -166,7 +175,7 @@ const Chat = () => {
 						ref={messageWindow}
 						className="flex flex-col-reverse overflow-y-scroll no-scrollbar m-0 flex-1 p-2  list-none"
 					>
-						{messageHistory.map((messageData, index) => {
+						{convo.conversations[conversationId]?.messages?.map((messageData, index) => {
 							return (
 								<li className="my-1" key={index.toString()}>
 									<ChatMessage

@@ -39,7 +39,7 @@ const conversationSlice = createSlice({
                       ...state.conversations,
                       [conversationId]: { // the conversation with new message
                         ...state.conversations[conversationId],
-                        messages: [...state.conversations[conversationId].messages, message],
+                        messages: [ message, ...state.conversations[conversationId].messages],
                       },
                     },
                   };  
