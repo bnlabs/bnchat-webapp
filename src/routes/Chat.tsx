@@ -15,6 +15,8 @@ import useUserSelector from "../hooks/useUserSelector";
 import useConversationSelector from "../hooks/useConversationSelector";
 import { useSelector, useDispatch } from "react-redux";
 import { addConversation, addMessage } from "../redux/conversationSlice";
+import SearchBar from "../components/Chat/SearchBar";
+import ConversationContainer from "../components/Chat/ConversationContainer";
 
 type MessagePayload = {
 	senderId: string;
@@ -117,9 +119,11 @@ const Chat = () => {
 	return (
 		<>
 			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden">
+				<SearchBar/>
 				<ul className="list-none">
 					{conversations.map((conversation) => {
 						let recipientName = '';
+						let latestMessage = conversation.messages[conversation.messages.length - 1];
 						for (const key in conversation.memberMap) {
 							if (key !== user.id) {
 							const value = conversation.memberMap[key];
@@ -129,14 +133,12 @@ const Chat = () => {
 						}
 						return (
 						<li key={conversation.conversationId}>
-							<button
-								onClick={() => {
+							<div className="border-white border-2 border-solid hover:bg-sky-700" onClick={() => {
 									connection?.invoke("JoinGroup", conversation.conversationId);
 									setConversationId(conversation.conversationId);
-								}}
-							>
-								{recipientName}
-							</button>
+								}}>
+							<ConversationContainer recipientName={recipientName} latestMessage={latestMessage}/>
+							</div>
 						</li>
 					)})}
 				</ul>
