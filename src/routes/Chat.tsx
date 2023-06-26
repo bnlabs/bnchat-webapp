@@ -17,6 +17,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { addConversation, addMessage } from "../redux/conversationSlice";
 import SearchBar from "../components/Chat/SearchBar";
 import ConversationContainer from "../components/Chat/ConversationContainer";
+import NotificationSound from "../../assets/sounds/notification-sound.mp3";
+import ControlPanel from "../components/Chat/ControlPanel";
+import WifiIcon from '@mui/icons-material/Wifi';
 
 type MessagePayload = {
 	senderId: string;
@@ -38,10 +41,8 @@ type ConversationPayload = {
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Chat = () => {
-	const [connectionStatus, setConnectionStatus] = useState<string>("Closed");
+	const [connectionStatus, setConnectionStatus] = useState<string>("Closed ❌ ");
 	const [messageHistory, setMessageHistory] = useState<MessagePayload[]>([]);
-	const [conversations, setConversations] = useState<ConversationPayload[]>([]);
-	// const [username, setUsername] = useState<string>("");
 	const convo = useConversationSelector();
 	const [conversationId, setConversationId] = useState<string>();
 	const messageWindow = useRef<HTMLUListElement | null>(null);
@@ -66,13 +67,15 @@ const Chat = () => {
 			.then(() => {
 				console.log("Connected!");
 				connection.on("ReceiveMessage", onMessage);
-				setConnectionStatus("Open");
+				setConnectionStatus("Open ✅");
 			})
 			.catch((e) => console.log("Connection failed: ", e));
 
 		const onMessage = (value: MessagePayload) => {
 			Dispatch(addMessage(value));
 			updateMessageHistory(value);
+			const audio = new Audio(NotificationSound);
+			audio.play();
 		};
 	}, [updateMessageHistory, connection]);
 
@@ -117,51 +120,47 @@ const Chat = () => {
 
 	return (
 		<>
-			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden">
-				<SearchBar/>
-				<ul className="list-none m-0 p-0">
-					{Object.keys(convo.conversations).map((key) => {
-						let recipientName = '';
-						const isActive = (key == conversationId);
-						const selectedClassname = isActive ? " bg-slate-700" : ""
-						console.log(selectedClassname);
-						const conversation = convo.conversations[key];
-						let latestMessage = conversation.messages[0];
-						for (const id in conversation.memberMap) {
-							if (id !== user.id) {
-							const value = conversation.memberMap[id];
-							recipientName = value;
-							break;
-							}
-						}
-
-						return (
-							<li key={conversation.id}>
-								<div className={"border-white border-2 border-solid hover:bg-sky-700" + 
-								selectedClassname} onClick={() => {
-										connection?.invoke("JoinGroup", conversation.id);
-										setConversationId(conversation.id);
-									}}>
-								<ConversationContainer recipientName={recipientName} latestMessage={latestMessage}/>
-								</div>
-							</li>
-						)
-						
-					})}
-				</ul>
-			</div>
-			<div className="flex flex-1 flex-col items-center p-4 bg-slate-950 rounded-xl">
+			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden flex flex-col justify-between">
 				<div>
-					<label className="mb-2">Connection Status: {connectionStatus}</label>
+					<SearchBar/>
+					<ul className="list-none m-0 p-0">
+						{Object.keys(convo.conversations).map((key) => {
+							let recipientName = '';
+							const isActive = (key == conversationId);
+							const selectedClassname = isActive ? " bg-slate-700" : ""
+							const conversation = convo.conversations[key];
+							let latestMessage = conversation.messages[0];
+							for (const id in conversation.memberMap) {
+								if (id !== user.id) {
+								const value = conversation.memberMap[id];
+								recipientName = value;
+								break;
+								}
+							}
+
+							return (
+								<li key={conversation.id}>
+									<div className={"border-gray-700 border-b-0 border-t border-x-0 border-solid hover:text-slate-500" + 
+									selectedClassname} onClick={() => {
+											connection?.invoke("JoinGroup", conversation.id);
+											setConversationId(conversation.id);
+										}}>
+									<ConversationContainer recipientName={recipientName} latestMessage={latestMessage}/>
+									</div>
+								</li>
+							)
+							
+						})}
+					</ul>
+				</div>
+				<ControlPanel/>
+			</div>
+			<div className="flex flex-1 flex-col p-4 bg-slate-950 rounded-xl">
+				<div className="mb-4">
+					<label className="mb-2 flex items-center"> <WifiIcon className="mr-2"/>
+					 {connectionStatus}</label>
 					<div>
-						<p>Username: {user.username}</p>
-						<form
-							className="flex mb-2 items-center"
-							action="submit"
-							onSubmit={handleSetConversationId}
-						>
-							<label className="mr-2">Conversation: {conversationId}</label>
-						</form>
+						<label className="mr-2">Conversation: {conversationId}</label>
 					</div>
 				</div>
 				<div className="flex flex-1 overflow-hidden w-full rounded bg-slate-800">
@@ -169,7 +168,7 @@ const Chat = () => {
 						ref={messageWindow}
 						className="flex flex-col-reverse overflow-y-scroll no-scrollbar m-0 flex-1 p-2  list-none"
 					>
-						{convo.conversations[conversationId]?.messages?.map((messageData, index) => {
+						{convo.conversations[conversationId]?.messages?.map((messageData:any, index:any) => {
 							return (
 								<li className="my-1" key={index.toString()}>
 									<ChatMessage

@@ -13,19 +13,22 @@ const ChatMessage = ({
 	return (
 		<div className="bg-slate-900 p-2 rounded-xl">
 			<div className="flex items-center">
-				<div className="flex items-center text-xs mr-2">
+				<div className="flex flex-row items-center text-xs ">
 					<Avatar size={"xs"} />
 					<strong>{username}</strong>
-				</div>
-				<div>
-					<span className="text-xs text-gray-400">
-						{new Date(timestamp).toLocaleTimeString()} 
-						{' '}
-						{new Date(timestamp).getMonth()}/
-						{new Date(timestamp).getDate()}/
-						{new Date(timestamp).getFullYear()}
+					<span className="text-xs text-gray-400 ml-2">
+						{(new Date(timestamp)).toLocaleString('en-UK', {
+							hour: "2-digit",
+							minute: "2-digit",
+							day: "2-digit",
+							month: "long",
+							year: "numeric",
+							hour12: true
+						})}
 					</span>
 				</div>
+				
+				
 			</div>
 			<div className="break-words">{children ?? ""}</div>
 		</div>
