@@ -86,7 +86,6 @@ const Chat = () => {
 				withCredentials: true,
 			})
 			.then((response) => {
-				setConversations(response.data);
 				setConversationId(response.data[0].id);
 				response.data.forEach(function (value:ConversationPayload) {
 					value.messages.forEach((msg) => {
@@ -120,27 +119,31 @@ const Chat = () => {
 		<>
 			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden">
 				<SearchBar/>
-				<ul className="list-none">
-					{conversations.map((conversation) => {
+				<ul className="list-none m-0 p-0">
+					{Object.keys(convo.conversations).map((key) => {
 						let recipientName = '';
-						let latestMessage = conversation.messages[conversation.messages.length - 1];
-						for (const key in conversation.memberMap) {
-							if (key !== user.id) {
-							const value = conversation.memberMap[key];
+						const conversation = convo.conversations[key];
+						let latestMessage = conversation.messages[0];
+						for (const id in conversation.memberMap) {
+							if (id !== user.id) {
+							const value = conversation.memberMap[id];
 							recipientName = value;
 							break;
 							}
 						}
+
 						return (
-						<li key={conversation.conversationId}>
-							<div className="border-white border-2 border-solid hover:bg-sky-700" onClick={() => {
-									connection?.invoke("JoinGroup", conversation.conversationId);
-									setConversationId(conversation.conversationId);
-								}}>
-							<ConversationContainer recipientName={recipientName} latestMessage={latestMessage}/>
-							</div>
-						</li>
-					)})}
+							<li key={conversation.id}>
+								<div className="border-white border-2 border-solid hover:bg-sky-700" onClick={() => {
+										connection?.invoke("JoinGroup", conversation.id);
+										setConversationId(conversation.id);
+									}}>
+								<ConversationContainer recipientName={recipientName} latestMessage={latestMessage}/>
+								</div>
+							</li>
+						)
+						
+					})}
 				</ul>
 			</div>
 			<div className="flex flex-1 flex-col items-center p-4 bg-slate-950 rounded-xl">

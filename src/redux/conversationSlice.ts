@@ -5,8 +5,9 @@ type ConversationState = {
     conversations: {
         [conversationId: string]: {
           id: string;
-          memberIds: string[]
+          memberIds: string[];
           messages: Message[];
+          memberMap: any;
         };
       };
     }
@@ -51,12 +52,14 @@ const conversationSlice = createSlice({
                   id: string;
                   memberIds: string[];
                   messages: Message[];
+                  memberMap: any;
                 };
               } = {
                 [action.payload.conversationId]: {
                   id: action.payload.conversationId,
                   memberIds: action.payload.memberIds,
-                  messages: action.payload.messages
+                  messages: action.payload.messages,
+                  memberMap: action.payload.memberMap
                 }};
 
                 return {

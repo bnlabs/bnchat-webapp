@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 interface SearchBarProps {
-  onSearch: (searchTerm: string) => void;
 }
 
 const apiUrl = import.meta.env.VITE_API_URL;
