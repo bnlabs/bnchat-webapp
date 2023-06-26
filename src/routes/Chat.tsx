@@ -122,6 +122,9 @@ const Chat = () => {
 				<ul className="list-none m-0 p-0">
 					{Object.keys(convo.conversations).map((key) => {
 						let recipientName = '';
+						const isActive = (key == conversationId);
+						const selectedClassname = isActive ? " bg-slate-700" : ""
+						console.log(selectedClassname);
 						const conversation = convo.conversations[key];
 						let latestMessage = conversation.messages[0];
 						for (const id in conversation.memberMap) {
@@ -134,7 +137,8 @@ const Chat = () => {
 
 						return (
 							<li key={conversation.id}>
-								<div className="border-white border-2 border-solid hover:bg-sky-700" onClick={() => {
+								<div className={"border-white border-2 border-solid hover:bg-sky-700" + 
+								selectedClassname} onClick={() => {
 										connection?.invoke("JoinGroup", conversation.id);
 										setConversationId(conversation.id);
 									}}>
