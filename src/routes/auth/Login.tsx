@@ -36,8 +36,8 @@ const Login = () => {
 			{
 				loading: "Loading...",
 				success: (response) => {
-					const { username, id } = response.data;
-					dispatch(setUser({ username, id }));
+					const { username, id, pictureUrl } = response.data;
+					dispatch(setUser({ username, id, avatar:pictureUrl }));
 					setIsLoading(false);
 					navigate("/app");
 

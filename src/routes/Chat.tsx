@@ -111,13 +111,6 @@ const Chat = () => {
 		});
 	};
 
-
-	const handleSetConversationId = (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		connection?.invoke("JoinGroup", event.currentTarget.conversationId.value);
-		setConversationId(event.currentTarget.conversationId.value);
-	};
-
 	return (
 		<>
 			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden flex flex-col justify-between">
@@ -168,12 +161,13 @@ const Chat = () => {
 						ref={messageWindow}
 						className="flex flex-col-reverse overflow-y-scroll no-scrollbar m-0 flex-1 p-2  list-none"
 					>
-						{convo.conversations[conversationId]?.messages?.map((messageData:any, index:any) => {
+						{convo.conversations[conversationId]?.messages?.map((messageData:MessagePayload, index:any) => {
 							return (
 								<li className="my-1" key={index.toString()}>
 									<ChatMessage
 										username={messageData.senderName}
 										timestamp={messageData.timestamp}
+										avatarUrl={messageData.senderId == user.id ? user.avatar : null}
 									>
 										{messageData.content}
 									</ChatMessage>

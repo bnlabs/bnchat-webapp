@@ -27,7 +27,7 @@ const ControlPanel = () => {
 
         <div className="border-gray-700 border-b border-t-0 border-x-0 border-solid">
             <div className="m-3 flex">
-                <Avatar size={"lg"} className="mr-2" />
+                <Avatar size={"lg"} className="mr-2" src={user.avatar}/>
                 {user.username}
             </div>
             <div className="text-right right-0 flex justify-end">
