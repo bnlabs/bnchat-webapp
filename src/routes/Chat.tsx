@@ -111,13 +111,25 @@ const Chat = () => {
 		});
 	};
 
+	const compareFunction = (keyA:string, keyB:string) => {
+		const conversationA = convo.conversations[keyA];
+		const conversationB = convo.conversations[keyB];
+		
+		const lastMessageA = conversationA.messages[0];
+		const lastMessageB = conversationB.messages[0];
+		const A = new Date(lastMessageA.timestamp);
+		const B = new Date(lastMessageB.timestamp);
+
+		return +A - +B;
+	}
+
 	return (
 		<>
 			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden flex flex-col justify-between">
 				<div>
 					<SearchBar/>
 					<ul className="list-none m-0 p-0">
-						{Object.keys(convo.conversations).map((key) => {
+						{Object.keys(convo.conversations).sort(compareFunction).reverse().map((key) => {
 							let recipientName = '';
 							const isActive = (key == conversationId);
 							const selectedClassname = isActive ? " bg-slate-700" : ""
