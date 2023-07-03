@@ -13,13 +13,15 @@ import SignalRContext from "../components/SignalR/SignalRContext";
 import axios from "axios";
 import useUserSelector from "../hooks/useUserSelector";
 import useConversationSelector from "../hooks/useConversationSelector";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addConversation, addMessage } from "../redux/conversationSlice";
 import SearchBar from "../components/Chat/SearchBar";
 import ConversationContainer from "../components/Chat/ConversationContainer";
 import NotificationSound from "../../assets/sounds/notification-sound.mp3";
 import ControlPanel from "../components/Chat/ControlPanel";
 import WifiIcon from '@mui/icons-material/Wifi';
+import { setUserMap } from "../redux/userMapSlice";
+import useUserMapSelector from "../hooks/useUserMapSelector";
 
 type MessagePayload = {
 	senderId: string;
@@ -48,6 +50,9 @@ const Chat = () => {
 	const messageWindow = useRef<HTMLUListElement | null>(null);
 	const Dispatch = useDispatch();
 	const user = useUserSelector();
+	const userMap = useUserMapSelector();
+
+	console.log(userMap.userMap.filter(u => u.id == "2d0864cb-b289-4789-8bd6-8e451855a426")[0]);
 
 	const updateMessageHistory = useCallback(
 		(message: MessagePayload) => {
@@ -84,19 +89,31 @@ const Chat = () => {
 	}, [messageHistory]);
 
 	useEffect(() => {
+		var guidList:string[] = [];
 		axios
 			.get(`${apiUrl}/Message/getConversation?userId=${user.id}`, {
 				withCredentials: true,
 			})
 			.then((response) => {
-				setConversationId(response.data[0].id);
+				// console.log(response.data);
+				// setConversationId(response.data[0].conversationId);
 				response.data.forEach(function (value:ConversationPayload) {
 					value.messages.forEach((msg) => {
 						msg.senderName = value.memberMap[msg.senderId];
 					})
+					value.memberIds.forEach((id) => {
+						guidList.push(id);
+						
+					});
 					Dispatch(addConversation(value));
 				});
+				axios
+					.post(`${apiUrl}/User/getUsers`, guidList,{withCredentials: true, })
+					.then((response) => {
+						Dispatch(setUserMap(response.data))
+					});
 			});
+
 	}, [user.id]);
 
 	const handleSendMessage = (event: FormEvent<HTMLFormElement>) => {
@@ -131,6 +148,7 @@ const Chat = () => {
 					<ul className="list-none m-0 p-0">
 						{Object.keys(convo.conversations).sort(compareFunction).reverse().map((key) => {
 							let recipientName = '';
+							let avatarUrl = '';
 							const isActive = (key == conversationId);
 							const selectedClassname = isActive ? " bg-slate-700" : ""
 							const conversation = convo.conversations[key];
@@ -138,6 +156,7 @@ const Chat = () => {
 							for (const id in conversation.memberMap) {
 								if (id !== user.id) {
 								const value = conversation.memberMap[id];
+								avatarUrl = userMap.userMap.filter(u => u.id == id)[0]?.pictureUrl;
 								recipientName = value;
 								break;
 								}
@@ -150,7 +169,7 @@ const Chat = () => {
 											connection?.invoke("JoinGroup", conversation.id);
 											setConversationId(conversation.id);
 										}}>
-									<ConversationContainer recipientName={recipientName} latestMessage={latestMessage}/>
+									<ConversationContainer recipientName={recipientName} latestMessage={latestMessage} avatarUrl={avatarUrl}/>
 									</div>
 								</li>
 							)
@@ -179,7 +198,7 @@ const Chat = () => {
 									<ChatMessage
 										username={messageData.senderName}
 										timestamp={messageData.timestamp}
-										avatarUrl={messageData.senderId == user.id ? user.avatar : null}
+										avatarUrl={userMap.userMap.filter(u => u.id == messageData.senderId)[0]?.pictureUrl}
 									>
 										{messageData.content}
 									</ChatMessage>

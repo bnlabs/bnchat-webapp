@@ -3,11 +3,11 @@ import en from 'javascript-time-ago/locale/en'
 import { Avatar } from '@mantine/core'
 
 
-const ConversationContainer = ({recipientName, latestMessage} : {recipientName:string,latestMessage:any }) => {
+const ConversationContainer = ({recipientName, latestMessage, avatarUrl} : {recipientName:string,latestMessage:any, avatarUrl:string }) => {
     TimeAgo.addDefaultLocale(en)
     const timeAgo = new TimeAgo('en-US');
     return <div className="p-3 flex">
-        <Avatar size={"lg"} className="mr-3" />
+        <Avatar size={"lg"} className="mr-3" src={avatarUrl}/>
         <div>
             <div className="p-1 font-extrabold">
                 {recipientName}
