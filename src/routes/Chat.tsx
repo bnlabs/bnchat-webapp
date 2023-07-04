@@ -6,7 +6,6 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { Button, Input } from "@mantine/core";
 import ChatMessage from "../components/Chat/ChatMessage";
 import ChatSender from "../components/Chat/ChatSender";
 import SignalRContext from "../components/SignalR/SignalRContext";
@@ -22,6 +21,7 @@ import ControlPanel from "../components/Chat/ControlPanel";
 import WifiIcon from '@mui/icons-material/Wifi';
 import { setUserMap } from "../redux/userMapSlice";
 import useUserMapSelector from "../hooks/useUserMapSelector";
+import Settings from "../components/Chat/Settings";
 
 type MessagePayload = {
 	senderId: string;
@@ -45,14 +45,13 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const Chat = () => {
 	const [connectionStatus, setConnectionStatus] = useState<string>("Closed ❌ ");
 	const [messageHistory, setMessageHistory] = useState<MessagePayload[]>([]);
+	const [settingContainer, setSettingContainer] = useState(false);
 	const convo = useConversationSelector();
 	const [conversationId, setConversationId] = useState<string>();
 	const messageWindow = useRef<HTMLUListElement | null>(null);
 	const Dispatch = useDispatch();
 	const user = useUserSelector();
 	const userMap = useUserMapSelector();
-
-	console.log(userMap.userMap.filter(u => u.id == "2d0864cb-b289-4789-8bd6-8e451855a426")[0]);
 
 	const updateMessageHistory = useCallback(
 		(message: MessagePayload) => {
@@ -140,7 +139,13 @@ const Chat = () => {
 		return +A - +B;
 	}
 
+	const toggleSetting = () => 
+	{
+		setSettingContainer(!settingContainer);
+	}
+
 	return (
+		<>
 		<>
 			<div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden flex flex-col justify-between">
 				<div>
@@ -177,7 +182,7 @@ const Chat = () => {
 						})}
 					</ul>
 				</div>
-				<ControlPanel/>
+				<ControlPanel toggleSetting={toggleSetting}/>
 			</div>
 			<div className="flex flex-1 flex-col p-4 bg-slate-950 rounded-xl">
 				<div className="mb-4">
@@ -214,6 +219,10 @@ const Chat = () => {
 					/>
 				</div>
 			</div>
+		</>
+		<div className="absolute">
+			{<Settings isOpen={settingContainer} toggleFunc={toggleSetting}/>}
+		</div>
 		</>
 	);
 };

@@ -7,7 +7,7 @@ import MicOffIcon from '@mui/icons-material/MicOff';
 import { Avatar } from "@mantine/core";
 import { useState } from "react";
 
-const ControlPanel = () => {
+const ControlPanel = ({toggleSetting}:{toggleSetting:()=>void}) => {
     const [isMuted, setMute] = useState(false);
     const [isDeafen, setDeafen] = useState(false);
 
@@ -37,7 +37,7 @@ const ControlPanel = () => {
                 <IconButton onClick={() => toggleDeafen()}>
                     {isDeafen ? <HeadsetOffIcon className="m-auto"/> : <HeadsetIcon className="m-auto"/>}
                 </IconButton>
-                <IconButton onClick={() => {}}>
+                <IconButton onClick={toggleSetting}>
                     <SettingsIcon className="m-auto"/>
                 </IconButton>
             </div>
