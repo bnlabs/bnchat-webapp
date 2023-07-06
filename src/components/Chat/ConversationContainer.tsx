@@ -12,7 +12,7 @@ const ConversationContainer = ({recipientName, latestMessage, avatarUrl} : {reci
             <div className="p-1 font-extrabold">
                 {recipientName}
             </div>
-            {latestMessage?.senderName || ""}: {latestMessage?.content || ""}
+                {latestMessage ? (latestMessage?.senderName + ": " + latestMessage.content) : ""}
             <div className='text-xs text-gray-500'>
                 {latestMessage ? timeAgo.format(new Date(latestMessage?.timestamp)) : ""}
             </div>
