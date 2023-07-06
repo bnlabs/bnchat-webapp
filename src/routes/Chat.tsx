@@ -208,7 +208,7 @@ const Chat = () => {
 							ref={messageWindow}
 							className="flex flex-col-reverse overflow-y-scroll no-scrollbar m-0 flex-1 p-2  list-none"
 						>
-							{convo.conversations[conversationId]?.messages?.map((messageData:MessagePayload, index:any) => {
+							{convo.conversations[conversationId || ""]?.messages?.map((messageData:MessagePayload, index:any) => {
 								return (
 									<li className="my-1" key={index.toString()}>
 										<ChatMessage

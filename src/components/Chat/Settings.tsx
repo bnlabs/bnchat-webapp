@@ -7,7 +7,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 
 const SettingModal = ({isOpen,toggleFunc}:{isOpen:boolean, toggleFunc: ()=>void}) => {
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | any | null >(null);
 
   const handleUpload = () => {
     const formData = new FormData();
