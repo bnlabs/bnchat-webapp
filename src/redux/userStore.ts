@@ -4,11 +4,11 @@ import userMapSlice from "./userMapSlice";
 import conversationSlice from "./conversationSlice";
 
 export const userStore = configureStore({
-	reducer: {
-		user: userSlice.reducer,
-		conversation: conversationSlice.reducer,
-		userMap: userMapSlice.reducer
-	},
+  reducer: {
+    user: userSlice.reducer,
+    conversation: conversationSlice.reducer,
+    userMap: userMapSlice.reducer,
+  },
 });
 
 export default userStore;
