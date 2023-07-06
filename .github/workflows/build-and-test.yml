@@ -1,0 +1,33 @@
+name: PR build and test
+
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 20.x
+
+      - name: Setup pnpm
+        run: |
+          npm install -g pnpm
+          pnpm install
+
+      - name: Build app
+        run: pnpm run build
+
+      # - name: Run tests
+      #   run: pnpm run test
+      
+        
