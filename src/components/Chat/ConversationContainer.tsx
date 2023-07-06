@@ -4,7 +4,7 @@ import { Avatar } from '@mantine/core'
 
 
 const ConversationContainer = ({recipientName, latestMessage, avatarUrl} : {recipientName:string,latestMessage:any, avatarUrl:string }) => {
-    TimeAgo.addDefaultLocale(en)
+    TimeAgo.addLocale(en);
     const timeAgo = new TimeAgo('en-US');
     return <div className="p-3 flex">
         <Avatar size={"lg"} className="mr-3" src={avatarUrl}/>
@@ -12,9 +12,9 @@ const ConversationContainer = ({recipientName, latestMessage, avatarUrl} : {reci
             <div className="p-1 font-extrabold">
                 {recipientName}
             </div>
-            {latestMessage.senderName}: {latestMessage.content}
+            {latestMessage?.senderName || ""}: {latestMessage?.content || ""}
             <div className='text-xs text-gray-500'>
-                {timeAgo.format(new Date(latestMessage.timestamp))}
+                {latestMessage ? timeAgo.format(new Date(latestMessage?.timestamp)) : ""}
             </div>
         </div>
     </div>
