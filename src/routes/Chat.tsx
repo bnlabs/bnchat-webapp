@@ -120,14 +120,16 @@ const Chat = () => {
 
   const handleSendMessage = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (event.currentTarget.message.value === "") return;
-
-    connection?.invoke("SendMessage", {
+    const command = {
       senderId: user.id,
+      receiverId: convo.conversations[conversationId].memberIds.filter(memberId => memberId !== user.id)[0],
       senderName: user.username,
       content: event.currentTarget.message.value,
-      conversationId,
-    });
+      conversationId
+    };
+
+    connection?.invoke("SendMessage", command);
+    if (event.currentTarget.message.value === "") return;
   };
 
   const compareFunction = (keyA: string, keyB: string) => {
