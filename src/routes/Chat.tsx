@@ -122,7 +122,7 @@ const Chat = () => {
     event.preventDefault();
     const command = {
       senderId: user.id,
-      receiverId: convo.conversations[conversationId].memberIds.filter(memberId => memberId !== user.id)[0],
+      receiverId: convo.conversations[conversationId || ""].memberIds.filter(memberId => memberId !== user.id)[0],
       senderName: user.username,
       content: event.currentTarget.message.value,
       conversationId
