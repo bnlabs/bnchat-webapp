@@ -1,8 +1,5 @@
 import { Button } from "@mantine/core";
-import axios from "axios";
 import { Link } from "react-router-dom";
-
-const apiUrl = import.meta.env.VITE_API_URL;
 
 const Index = () => {
 	return (
@@ -14,23 +11,9 @@ const Index = () => {
 				<Button>Login</Button>
 			</Link>
 			<Button
-				onClick={() => {
-					axios
-						.get(
-							`${apiUrl}/Message/getConversation?userId=2d0864cb-b289-4789-8bd6-8e451855a426`,
-							{
-								withCredentials: true,
-							}
-						)
-						.then((response) => {
-							console.log(response.data);
-						})
-						.catch((error) => {
-							console.log(error);
-						});
-				}}
+				onClick={() => {console.log("ah yes, a button")}}
 			>
-				Test endpoint
+				Signup
 			</Button>
 		</div>
 	);
