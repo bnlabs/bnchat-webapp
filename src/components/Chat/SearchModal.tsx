@@ -2,20 +2,31 @@ import React, { useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { Avatar } from "@mantine/core";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
+import { addConversation } from "../../redux/conversationSlice";
+import useConversationSelector from "../../hooks/useConversationSelector";
+import { useDispatch } from "react-redux";
+import useUserSelector from "../../hooks/useUserSelector";
+import { addUserToMap } from "../../redux/userMapSlice";
+import { Conversation } from "../../Types";
 
-interface SearchBarProps {}
-
-interface SearchResult {
+type user = {
   id: string;
-  name: string;
   pictureUrl: string;
-}
+  username: string;
+};
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const SearchModal: React.FC<SearchBarProps> = () => {
+const SearchModal = ({
+  setConversationFunc,
+}: {
+  setConversationFunc: (id: string) => void;
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<user[]>([]);
+  const convo = useConversationSelector();
+  const user = useUserSelector();
+  const Dispatch = useDispatch();
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -26,7 +37,7 @@ const SearchModal: React.FC<SearchBarProps> = () => {
       .get(`${apiUrl}/User/SearchUsername?searchInput=${searchTerm}`, {
         withCredentials: true,
       })
-      .then((response: AxiosResponse<SearchResult[]>) => {
+      .then((response: AxiosResponse<user[]>) => {
         setSearchResults(response.data);
       })
       .catch((error) => {
@@ -34,14 +45,31 @@ const SearchModal: React.FC<SearchBarProps> = () => {
       });
   };
 
-  const startConversation = (userId: string) => {
-    const payload = {
-      memberIds: [userId],
+  const startConversation = (result: user) => {
+    const conversationIdList = convo.conversations.filter((c) =>
+      c.memberIds.includes(result.id)
+    );
+    const convoExist = conversationIdList.length > 0;
+
+    if (convoExist) {
+      setConversationFunc(conversationIdList[0].conversationId);
+      return;
+    }
+
+    const otherUserId = result.id;
+    const newConversation: Conversation = {
+      conversationId: "",
+      memberIds: [result.id, user.id || ""],
+      messages: [],
+      memberMap: {
+        [otherUserId]: result.username,
+        [user.id || ""]: user.username,
+      },
     };
 
-    axios.post(`${apiUrl}/Message/createConversation`, payload, {
-      withCredentials: true,
-    });
+    Dispatch(addUserToMap(result));
+    Dispatch(addConversation(newConversation));
+    return;
   };
 
   return (
@@ -59,11 +87,8 @@ const SearchModal: React.FC<SearchBarProps> = () => {
             className="text-slate-300 flex flex-row justify-between"
           >
             <Avatar size={"lg"} src={result.pictureUrl} />
-            <div className="text-lg">{result.name}</div>
-            <button
-              className="m-2"
-              onClick={() => startConversation(result.id)}
-            >
+            <div className="text-lg">{result.username}</div>
+            <button className="m-2" onClick={() => startConversation(result)}>
               <ChatBubbleIcon />
             </button>
           </li>

@@ -28,6 +28,7 @@ import { Modal } from "@mantine/core";
 
 type MessagePayload = {
   senderId: string;
+  receiverId: string;
   content: string;
   senderName: string;
   conversationId: string;
@@ -49,7 +50,6 @@ const Chat = () => {
     useState<string>("Closed ❌ ");
   const [messageHistory, setMessageHistory] = useState<MessagePayload[]>([]);
   const [settingContainer, setSettingContainer] = useState(false);
-  const [searchUserModal, setSearchUserModal] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const convo = useConversationSelector();
   const [conversationId, setConversationId] = useState<string>();
@@ -80,11 +80,15 @@ const Chat = () => {
       })
       .catch((e) => console.log("Connection failed: ", e));
 
-    const onMessage = (value: MessagePayload) => {
-      Dispatch(addMessage(value));
-      updateMessageHistory(value);
+    const onMessage = (value: any) => {
+      console.log(value);
+      if (value.senderId === user.id) {
+        setConversationId(value.conversationId);
+      }
       const audio = new Audio(NotificationSound);
       audio.play();
+      Dispatch(addMessage(value));
+      updateMessageHistory(value);
     };
   }, [updateMessageHistory, connection]);
 
@@ -95,14 +99,12 @@ const Chat = () => {
   useEffect(() => {
     var guidList: string[] = [];
     axios
-      .get(`${apiUrl}/Message/getConversation?userId=${user.id}`, {
+      .get(`${apiUrl}/Message/getConversation`, {
         withCredentials: true,
       })
-      .then((response) => {
-        // console.log(response.data);
-        // setConversationId(response.data[0].conversationId);
+      .then((response: { data: ConversationPayload[] }) => {
         response.data.forEach(function (value: ConversationPayload) {
-          value.messages.forEach((msg) => {
+          value?.messages.forEach((msg) => {
             msg.senderName = value.memberMap[msg.senderId];
           });
           value.memberIds.forEach((id) => {
@@ -112,40 +114,42 @@ const Chat = () => {
         });
         axios
           .post(`${apiUrl}/User/getUsers`, guidList, { withCredentials: true })
-          .then((response) => {
+          .then((response: { data: any }) => {
             Dispatch(setUserMap(response.data));
           });
       });
-  }, [user.id]);
+  }, []);
 
   const handleSendMessage = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const command = {
       senderId: user.id,
-      receiverId: convo.conversations[conversationId || ""].memberIds.filter(memberId => memberId !== user.id)[0],
+      receiverId: convo.conversations
+        .filter((c) => c.conversationId === conversationId)[0]
+        .memberIds.filter((memberId) => memberId !== user.id)[0],
       senderName: user.username,
       content: event.currentTarget.message.value,
-      conversationId
+      conversationId,
     };
 
     connection?.invoke("SendMessage", command);
     if (event.currentTarget.message.value === "") return;
   };
 
-  const compareFunction = (keyA: string, keyB: string) => {
-    const conversationA = convo.conversations[keyA];
-    const conversationB = convo.conversations[keyB];
+  const toggleSetting = () => {
+    setSettingContainer(!settingContainer);
+  };
 
+  const compareFunction = (
+    conversationA: ConversationPayload,
+    conversationB: ConversationPayload
+  ) => {
     const lastMessageA = conversationA.messages[0];
     const lastMessageB = conversationB.messages[0];
     const A = new Date(lastMessageA?.timestamp || "");
     const B = new Date(lastMessageB?.timestamp || "");
 
     return +A - +B;
-  };
-
-  const toggleSetting = () => {
-    setSettingContainer(!settingContainer);
   };
 
   return (
@@ -157,36 +161,45 @@ const Chat = () => {
               <AddIcon />
             </button>
             <ul className="list-none m-0 p-0">
-              {Object.keys(convo.conversations)
+              {[...convo.conversations]
                 .sort(compareFunction)
                 .reverse()
-                .map((key) => {
+                .map((c) => {
                   let recipientName = "";
                   let avatarUrl = "";
-                  const isActive = key == conversationId;
+                  const isActive = c.conversationId === conversationId;
                   const selectedClassname = isActive ? " bg-slate-700" : "";
-                  const conversation = convo.conversations[key];
-                  let latestMessage = conversation.messages[0];
+                  const conversation = convo.conversations.filter(
+                    (e) => e.conversationId === c.conversationId
+                  )[0];
+                  let latestMessage = conversation?.messages[0];
                   for (const id in conversation.memberMap) {
-                    if (id !== user.id) {
-                      const value = conversation.memberMap[id];
-                      avatarUrl = userMap.userMap.filter((u) => u.id == id)[0]
-                        ?.pictureUrl;
-                      recipientName = value;
-                      break;
+                    if (id === user.id) {
+                      continue;
                     }
+                    const value = conversation.memberMap[id];
+                    avatarUrl =
+                      userMap.userMap.filter(
+                        (u: { id: string }) => u.id == id
+                      )[0]?.pictureUrl || "";
+
+                    recipientName = value;
+                    break;
                   }
 
                   return (
-                    <li key={conversation.id}>
+                    <li key={conversation.conversationId}>
                       <div
                         className={
                           "border-gray-700 border-b-0 border-t border-x-0 border-solid hover:text-slate-500" +
                           selectedClassname
                         }
                         onClick={() => {
-                          connection?.invoke("JoinGroup", conversation.id);
-                          setConversationId(conversation.id);
+                          connection?.invoke(
+                            "JoinGroup",
+                            conversation.conversationId
+                          );
+                          setConversationId(conversation.conversationId);
                         }}
                       >
                         <ConversationContainer
@@ -218,8 +231,9 @@ const Chat = () => {
               ref={messageWindow}
               className="flex flex-col-reverse overflow-y-scroll no-scrollbar m-0 flex-1 p-2  list-none"
             >
-              {convo.conversations[conversationId || ""]?.messages?.map(
-                (messageData: MessagePayload, index: any) => {
+              {convo.conversations
+                .filter((c) => c.conversationId === conversationId)[0]
+                ?.messages?.map((messageData: MessagePayload, index: any) => {
                   return (
                     <li className="my-1" key={index.toString()}>
                       <ChatMessage
@@ -228,15 +242,14 @@ const Chat = () => {
                         avatarUrl={
                           userMap.userMap.filter(
                             (u) => u.id == messageData.senderId
-                          )[0]?.pictureUrl
+                          )[0]?.pictureUrl || ""
                         }
                       >
                         {messageData.content}
                       </ChatMessage>
                     </li>
                   );
-                }
-              )}
+                })}
             </ul>
           </div>
           <div className="flex w-full justify-center rounded mt-2 bg-slate-800 p-2">
@@ -250,7 +263,7 @@ const Chat = () => {
       <div className="absolute">
         {<Settings isOpen={settingContainer} toggleFunc={toggleSetting} />}
         <Modal opened={opened} onClose={close} title="Start Conversation">
-          <SearchModal />
+          <SearchModal setConversationFunc={setConversationId} />
         </Modal>
       </div>
     </>

@@ -23,10 +23,10 @@ const userMapSlice = createSlice({
       const newUser = action.payload;
       return {
         ...state,
-        userMap: {
+        userMap: [
           ...state.userMap,
           newUser,
-        },
+        ],
       };
     },
     setUserMap: (state, action: PayloadAction<any>) => {
