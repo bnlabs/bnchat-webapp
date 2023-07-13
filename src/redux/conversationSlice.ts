@@ -74,7 +74,7 @@ const conversationSlice = createSlice({
             conversationId: message.conversationId,
             messages: [message],
             memberIds: conversation.memberIds,
-            memberMap: conversation?.memberIds,
+            memberMap: conversation?.memberMap,
           };
         }
 

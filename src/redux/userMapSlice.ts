@@ -21,6 +21,10 @@ const userMapSlice = createSlice({
   reducers: {
     addUserToMap: (state, action: PayloadAction<any>) => {
       const newUser = action.payload;
+      const userAlreadyExist = state.userMap.filter(u => u.id === newUser.id).length > 0;
+
+      if(userAlreadyExist){ return; }
+
       return {
         ...state,
         userMap: [
