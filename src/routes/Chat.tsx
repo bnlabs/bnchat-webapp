@@ -247,16 +247,16 @@ const Chat = () => {
                       >
                         {messageData.content}
                         <div className="">
-                        {messageData.embeds?.map((embed:Embed, index:any) => {
-                          return <>
-                            <EmbedContainer urlPreview={embed}/>
-                          </>
-                        })}
-                        {(getImageUrls(messageData.content))?.map(a => {
-                          return <>
-                            <img src={a} className="p-2"/>
-                          </>
-                        })}
+                          {messageData.embeds?.map((embed:Embed, index:any) => {
+                            return <>
+                              <EmbedContainer urlPreview={embed}/>
+                            </>
+                          })}
+                          {(getImageUrls(messageData.content))?.map(a => {
+                            return <>
+                              <img src={a} className="p-2"/>
+                            </>
+                          })}
                         </div>
                       </ChatMessage>
                     </li>

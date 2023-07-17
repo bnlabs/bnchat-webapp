@@ -17,10 +17,12 @@ const ConversationContainer = ({
     <div className="p-3 flex">
       <Avatar size={"lg"} className="mr-3" src={avatarUrl} />
       <div>
-        <div className="p-1 font-extrabold">{recipientName}</div>
-        {latestMessage
-          ? latestMessage?.senderName + ": " + latestMessage.content
-          : ""}
+        <div className="p-1 font-extrabold w">{recipientName}</div>
+        <div className="break-all">
+          {latestMessage
+            ? latestMessage?.senderName + ": " + latestMessage.content
+            : ""}
+        </div>
         <div className="text-xs text-gray-500">
           {latestMessage
             ? timeAgo.format(new Date(latestMessage?.timestamp))

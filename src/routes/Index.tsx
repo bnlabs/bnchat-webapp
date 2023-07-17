@@ -10,11 +10,11 @@ const Index = () => {
 			<Link to="/auth/login">
 				<Button>Login</Button>
 			</Link>
-			<Button
-				onClick={() => {console.log("ah yes, a button")}}
-			>
-				Signup
-			</Button>
+			<Link to="/auth/signup">
+				<Button>
+					Signup
+				</Button>
+			</Link>
 		</div>
 	);
 };
