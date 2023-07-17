@@ -7,7 +7,7 @@ import useConversationSelector from "../../hooks/useConversationSelector";
 import { useDispatch } from "react-redux";
 import useUserSelector from "../../hooks/useUserSelector";
 import { addUserToMap } from "../../redux/userMapSlice";
-import { Conversation } from "../../Types";
+import { Conversation } from "../../types/Conversation";
 
 type user = {
   id: string;

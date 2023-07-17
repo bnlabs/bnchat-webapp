@@ -1,25 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit/";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { Conversation } from "../types/Conversation";
+import { Message } from "../types/Message";
 
-type Conversation = {
-  conversationId: string;
-  memberIds: string[];
-  messages: Message[];
-  memberMap: any;
-};
 
 type ConversationState = {
   conversations: Conversation[];
-};
-
-type Message = {
-  senderId: string;
-  receiverId: string;
-  content: string;
-  senderName: string;
-  conversationId: string;
-  timestamp: string;
-  id: string;
 };
 
 const initialState: ConversationState = {

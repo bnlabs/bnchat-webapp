@@ -1,9 +1,4 @@
-export type Conversation = {
-  conversationId: string;
-  memberIds: string[];
-  messages: Message[];
-  memberMap: any;
-};
+import { Embed } from "./Embed";
 
 export type Message = {
   senderId: string;
@@ -13,4 +8,5 @@ export type Message = {
   conversationId: string;
   timestamp: string;
   id: string;
+  embeds: Embed[];
 };

@@ -25,30 +25,18 @@ import Settings from "../components/Chat/Settings";
 import SearchModal from "../components/Chat/SearchModal";
 import { useDisclosure } from "@mantine/hooks";
 import { Modal } from "@mantine/core";
+import { Message } from "../types/Message";
+import { Conversation } from "../types/Conversation";
+import { Embed } from "../types/Embed";
+import EmbedContainer from "../components/Chat/EmbedContainer";
 
-type MessagePayload = {
-  senderId: string;
-  receiverId: string;
-  content: string;
-  senderName: string;
-  conversationId: string;
-  timestamp: string;
-  id: string;
-};
-
-type ConversationPayload = {
-  conversationId: string;
-  memberIds: string[];
-  messages: MessagePayload[];
-  memberMap: any;
-};
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const Chat = () => {
   const [connectionStatus, setConnectionStatus] =
     useState<string>("Closed ❌ ");
-  const [messageHistory, setMessageHistory] = useState<MessagePayload[]>([]);
+  const [messageHistory, setMessageHistory] = useState<Message[]>([]);
   const [settingContainer, setSettingContainer] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const convo = useConversationSelector();
@@ -59,7 +47,7 @@ const Chat = () => {
   const userMap = useUserMapSelector();
 
   const updateMessageHistory = useCallback(
-    (message: MessagePayload) => {
+    (message: Message) => {
       setMessageHistory((prevMessageHistory) => [
         ...prevMessageHistory,
         message,
@@ -102,8 +90,8 @@ const Chat = () => {
       .get(`${apiUrl}/Message/getConversation`, {
         withCredentials: true,
       })
-      .then((response: { data: ConversationPayload[] }) => {
-        response.data.forEach(function (value: ConversationPayload) {
+      .then((response: { data: Conversation[] }) => {
+        response.data.forEach(function (value: Conversation) {
           value?.messages.forEach((msg) => {
             msg.senderName = value.memberMap[msg.senderId];
           });
@@ -141,8 +129,8 @@ const Chat = () => {
   };
 
   const compareFunction = (
-    conversationA: ConversationPayload,
-    conversationB: ConversationPayload
+    conversationA: Conversation,
+    conversationB: Conversation
   ) => {
     const lastMessageA = conversationA.messages[0];
     const lastMessageB = conversationB.messages[0];
@@ -151,6 +139,18 @@ const Chat = () => {
 
     return +A - +B;
   };
+
+  const getImageUrls = (content:string) => {
+    // Regular expression pattern to match image URLs
+    const imageUrlPattern = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/gi;
+  
+    // Extract all image URLs from the content
+    const imageUrls = content.match(imageUrlPattern) || null;
+  
+    return imageUrls;
+  }
+  
+  
 
   return (
     <>
@@ -233,7 +233,7 @@ const Chat = () => {
             >
               {convo.conversations
                 .filter((c) => c.conversationId === conversationId)[0]
-                ?.messages?.map((messageData: MessagePayload, index: any) => {
+                ?.messages?.map((messageData: Message, index: any) => {
                   return (
                     <li className="my-1" key={index.toString()}>
                       <ChatMessage
@@ -246,6 +246,18 @@ const Chat = () => {
                         }
                       >
                         {messageData.content}
+                        <div className="">
+                        {messageData.embeds?.map((embed:Embed, index:any) => {
+                          return <>
+                            <EmbedContainer urlPreview={embed}/>
+                          </>
+                        })}
+                        {(getImageUrls(messageData.content))?.map(a => {
+                          return <>
+                            <img src={a} className="p-2"/>
+                          </>
+                        })}
+                        </div>
                       </ChatMessage>
                     </li>
                   );
