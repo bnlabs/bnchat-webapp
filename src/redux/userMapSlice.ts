@@ -1,12 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit/";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-type user = {
-  id: string;
-  pictureUrl: string;
-  username: string;
-};
-
 type UserMapState = {
   userMap: user[];
 };
@@ -19,7 +13,7 @@ const userMapSlice = createSlice({
   name: "userMap",
   initialState,
   reducers: {
-    addUserToMap: (state, action: PayloadAction<any>) => {
+    addUserToMap: (state, action: PayloadAction<user>) => {
       const newUser = action.payload;
       const userAlreadyExist = state.userMap.filter(u => u.id === newUser.id).length > 0;
 

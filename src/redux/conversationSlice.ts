@@ -2,6 +2,8 @@ import { createSlice } from "@reduxjs/toolkit/";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { Conversation } from "../types/Conversation";
 import { Message } from "../types/Message";
+import { useContext } from "react";
+import SignalRContext from "../components/SignalR/SignalRContext";
 
 
 type ConversationState = {
@@ -12,13 +14,13 @@ const initialState: ConversationState = {
   conversations: [],
 };
 
+
 const conversationSlice = createSlice({
   name: "conversation",
   initialState,
   reducers: {
     addMessage: (state, action: PayloadAction<Message>) => {
       const message: Message = action.payload;
-
       // evaluate if conversation exist or if there is a conversation with the same user already
       const conversationExist =
         state.conversations.filter(
@@ -33,7 +35,8 @@ const conversationSlice = createSlice({
 
       // If the conversation doesn't exist, create a new one and add the message to it
       if (!conversationExist && !convoWithSameReceiver) {
-        const newConversation = {
+        console.log("new convo");
+        const newConversation: Conversation = {
           conversationId: message.conversationId,
           memberIds: [message.senderId, message.receiverId],
           messages: [message],
@@ -42,7 +45,7 @@ const conversationSlice = createSlice({
             [message.receiverId]: "",
           },
         };
-
+        console.log(newConversation);
         return {
           ...state,
           conversations: [...state.conversations, newConversation],

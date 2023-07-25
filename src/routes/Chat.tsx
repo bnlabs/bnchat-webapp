@@ -68,15 +68,25 @@ const Chat = () => {
       })
       .catch((e) => console.log("Connection failed: ", e));
 
-    const onMessage = (value: any) => {
+    const onMessage = (value: Message) => {
       console.log(value);
       if (value.senderId === user.id) {
         setConversationId(value.conversationId);
       }
       const audio = new Audio(NotificationSound);
       audio.play();
+      // const messageUser: user = {
+      //   id: value.senderId,
+      //   username: value.senderName,
+      //   pictureUrl: value.
+      // };
       Dispatch(addMessage(value));
+      // Dispatch(addUserToMap());
       updateMessageHistory(value);
+      connection?.invoke(
+        "JoinGroup",
+        value.conversationId
+      );
     };
   }, [updateMessageHistory, connection]);
 
@@ -99,6 +109,10 @@ const Chat = () => {
             guidList.push(id);
           });
           Dispatch(addConversation(value));
+          connection?.invoke(
+            "JoinGroup",
+            value.conversationId
+          );
         });
         axios
           .post(`${apiUrl}/User/getUsers`, guidList, { withCredentials: true })
@@ -195,10 +209,6 @@ const Chat = () => {
                           selectedClassname
                         }
                         onClick={() => {
-                          connection?.invoke(
-                            "JoinGroup",
-                            conversation.conversationId
-                          );
                           setConversationId(conversation.conversationId);
                         }}
                       >
