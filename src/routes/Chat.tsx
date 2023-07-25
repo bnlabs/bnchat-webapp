@@ -21,7 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import WifiIcon from "@mui/icons-material/Wifi";
 import { useDisclosure } from "@mantine/hooks";
 import { Modal } from "@mantine/core";
-import { setUserMap } from "../redux/userMapSlice";
+import { addUserToMap, setUserMap } from "../redux/userMapSlice";
 import useUserMapSelector from "../hooks/useUserMapSelector";
 import Settings from "../components/Chat/Settings";
 import SearchModal from "../components/Chat/SearchModal";
@@ -75,13 +75,18 @@ const Chat = () => {
       }
       const audio = new Audio(NotificationSound);
       audio.play();
-      // const messageUser: user = {
-      //   id: value.senderId,
-      //   username: value.senderName,
-      //   pictureUrl: value.
-      // };
       Dispatch(addMessage(value));
-      // Dispatch(addUserToMap());
+      if(!userMap.userMap.some(user => user.id == value.senderId))
+      {
+        console.log("user doesnt exist, requesting user info")
+        axios
+          .get(`${apiUrl}/User/getUserById/?userId=${value.senderId}`, {
+            withCredentials: true,
+          })
+          .then((response: { data: user }) => {
+            Dispatch(addUserToMap(response.data));
+          })
+      }
       updateMessageHistory(value);
       connection?.invoke(
         "JoinGroup",
@@ -163,17 +168,32 @@ const Chat = () => {
   
     return imageUrls;
   }
-  
-  
 
+  const IconButton = ({
+    children,
+    onClick,
+  }: {
+    children: JSX.Element;
+    onClick: () => void;
+  }) => {
+    return (
+      <div
+        className="rounded-md w-8 h-8 hover:bg-slate-600 flex m-1 mb-4"
+        onClick={onClick}
+      >
+        {children}
+      </div>
+    );
+  };
+  
   return (
     <>
       <>
         <div className="w-96 bg-slate-950 rounded-xl mr-2 max-lg:hidden flex flex-col justify-between">
           <div>
-            <button onClick={open}>
-              <AddIcon />
-            </button>
+            <IconButton onClick={open}>
+              <AddIcon className="m-auto"/>
+            </IconButton>
             <ul className="list-none m-0 p-0">
               {[...convo.conversations]
                 .sort(compareFunction)
